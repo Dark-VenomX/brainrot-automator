@@ -760,6 +760,8 @@ export default function WorkspacePage() {
             </div>
           </TabsContent>
         </Tabs>
+        </>
+        )}
       </main>
 
       {/* Floating Action Bar for Create Tab */}
