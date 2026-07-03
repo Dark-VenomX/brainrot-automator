@@ -36,7 +36,7 @@ export class VideoService {
 
   async getVideoInfo(url: string): Promise<{ duration: number; title?: string }> {
     try {
-      const command = `${YT_DLP_PATH} --dump-json --no-warnings --no-call-home --no-check-certificate --youtube-skip-dash-manifest "${url}"`;
+      const command = `${YT_DLP_PATH} --dump-json --no-warnings --no-check-certificate --youtube-skip-dash-manifest --extractor-args "youtube:player_client=ios,default" "${url}"`;
       const { stdout } = await execAsync(command);
       const info = JSON.parse(stdout);
       
@@ -61,7 +61,7 @@ export class VideoService {
 
     try {
       logger.info(`Downloading segment from ${url} (${startTime} to ${endTime})`);
-      const command = `${YT_DLP_PATH} --download-sections "*${startTime}-${endTime}" -o "${outputPath}" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --force-keyframes-at-cuts --no-warnings --no-call-home --no-check-certificate "${url}"`;
+      const command = `${YT_DLP_PATH} --download-sections "*${startTime}-${endTime}" -o "${outputPath}" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --force-keyframes-at-cuts --no-warnings --no-check-certificate --extractor-args "youtube:player_client=ios,default" "${url}"`;
       
       await execAsync(command);
       return outputPath;
