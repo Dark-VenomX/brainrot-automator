@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { apiClient, type SelfSufficiencyMetric } from '../lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
-import { BatteryLow, BatteryMedium, BatteryFull, Loader2, CalendarDays, Clock } from 'lucide-react';
+import { BatteryLow, BatteryMedium, BatteryFull, CalendarDays, Clock } from 'lucide-react';
 
 interface SelfSufficiencyTrackerProps {
   refreshKey?: number;
@@ -33,7 +33,7 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
     return (
       <Card className="border-0 shadow-lg">
         <CardContent className="py-6 flex items-center justify-center">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <div className="w-5 h-5 flex items-center justify-center text-muted-foreground"><div className="loader scale-[0.25]"></div></div>
         </CardContent>
       </Card>
     );

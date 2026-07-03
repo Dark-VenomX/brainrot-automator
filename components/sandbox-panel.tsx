@@ -19,7 +19,6 @@ import {
 } from './ui/dialog';
 import {
   FlaskConical,
-  Loader2,
   Play,
   CheckCircle,
   XCircle,
@@ -130,7 +129,7 @@ export function SandboxPanel() {
             <CardContent>
               {loadingSandbox ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <div className="w-4 h-4 flex items-center justify-center"><div className="loader scale-[0.2]"></div></div>
                   Loading...
                 </div>
               ) : (
@@ -145,7 +144,7 @@ export function SandboxPanel() {
                       {sandboxMode ? 'ON — posts are simulated' : 'OFF — live posting'}
                     </Badge>
                   </div>
-                  {savingSandbox && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
+                  {savingSandbox && <div className="w-4 h-4 flex items-center justify-center text-muted-foreground"><div className="loader scale-[0.2]"></div></div>}
                 </div>
               )}
               {sandboxMode && (
@@ -208,7 +207,7 @@ export function SandboxPanel() {
             <Button onClick={runDiagnostic} disabled={running} className="w-full">
               {running ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <div className="w-4 h-4 mr-2 flex items-center justify-center"><div className="loader scale-[0.2]"></div></div>
                   Running pipeline...
                 </>
               ) : (

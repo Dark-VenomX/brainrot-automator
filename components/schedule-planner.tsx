@@ -23,7 +23,6 @@ import {
   Plus,
   Trash2,
   Save,
-  Loader2,
   Settings2,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -155,8 +154,9 @@ export function SchedulePlanner({ onSaved }: SchedulePlannerProps) {
         </DialogHeader>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <div className="w-6 h-6 flex items-center justify-center mb-2"><div className="loader scale-[0.3]"></div></div>
+            <p className="text-sm">Loading schedule...</p>
           </div>
         ) : (
           <div className="space-y-6 pt-2">
@@ -331,7 +331,7 @@ export function SchedulePlanner({ onSaved }: SchedulePlannerProps) {
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <div className="w-4 h-4 mr-2 flex items-center justify-center"><div className="loader scale-[0.2]"></div></div>
                     Saving...
                   </>
                 ) : (

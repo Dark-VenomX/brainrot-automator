@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${oswald.variable} font-sans min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900`}>
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body className={`${inter.variable} ${oswald.variable} font-sans min-h-screen bg-[#06040A] text-white selection:bg-purple-500/30`}>
         <Providers>
           {children}
         </Providers>

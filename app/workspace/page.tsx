@@ -33,7 +33,6 @@ import {
   RefreshCw,
   CheckCircle,
   XCircle,
-  Loader2,
   Send,
   Plus,
   Settings,
@@ -60,10 +59,10 @@ type VideoStatus =
 
 const statusConfig: Record<VideoStatus, { label: string; color: string; icon: React.ReactNode }> = {
   pending: { label: 'Pending', color: 'bg-gray-500', icon: <Clock className="w-3 h-3" /> },
-  downloading: { label: 'Downloading', color: 'bg-blue-500', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
-  processing: { label: 'Processing', color: 'bg-blue-500', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+  downloading: { label: 'Downloading', color: 'bg-blue-500', icon: <div className="w-3 h-3 flex items-center justify-center"><div className="loader scale-[0.15]"></div></div> },
+  processing: { label: 'Processing', color: 'bg-blue-500', icon: <div className="w-3 h-3 flex items-center justify-center"><div className="loader scale-[0.15]"></div></div> },
   generating_script: { label: 'Writing Script', color: 'bg-purple-500', icon: <Sparkles className="w-3 h-3" /> },
-  creating_tts: { label: 'Creating Voice', color: 'bg-indigo-500', icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+  creating_tts: { label: 'Creating Voice', color: 'bg-indigo-500', icon: <div className="w-3 h-3 flex items-center justify-center"><div className="loader scale-[0.15]"></div></div> },
   rendering: { label: 'Rendering', color: 'bg-orange-500', icon: <Video className="w-3 h-3" /> },
   ready: { label: 'Ready', color: 'bg-green-500', icon: <CheckCircle className="w-3 h-3" /> },
   scheduled: { label: 'Scheduled', color: 'bg-cyan-500', icon: <Calendar className="w-3 h-3" /> },
@@ -234,28 +233,22 @@ export default function WorkspacePage() {
     return "";
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-          <p className="text-muted-foreground font-medium animate-pulse">Loading Workspace...</p>
-        </div>
-      </div>
-    );
+  if (loading && accounts.length === 0 && videos.length === 0) {
+    // Only show loading if we haven't loaded initial data yet, but don't block the whole page.
+    // We will render the shell and put the loader inside.
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
+    <div className="min-h-screen text-gray-300 pb-24">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-lg dark:bg-slate-900/80 sticky top-0 z-50">
+      <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 shadow-md flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
               <Video className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
-              Brainrot Studio
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              brainrot.ai
             </h1>
           </div>
           <div className="flex items-center gap-2">
@@ -315,15 +308,22 @@ export default function WorkspacePage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <SelfSufficiencyTracker refreshKey={trackerRefreshKey} />
-        </div>
+        {loading && accounts.length === 0 && videos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 gap-4">
+            <div className="w-10 h-10 flex items-center justify-center mb-2"><div className="loader scale-[0.5]"></div></div>
+            <p className="text-gray-400 font-medium animate-pulse">Loading Workspace...</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8">
+              <SelfSufficiencyTracker refreshKey={trackerRefreshKey} />
+            </div>
 
         <Tabs defaultValue="create" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl">
-            <TabsTrigger value="create" className="rounded-lg data-[state=active]:shadow-sm">Create</TabsTrigger>
-            <TabsTrigger value="queue" className="rounded-lg data-[state=active]:shadow-sm">Queue</TabsTrigger>
-            <TabsTrigger value="accounts" className="rounded-lg data-[state=active]:shadow-sm">Accounts</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto p-1 bg-white/5 rounded-xl border border-white/10">
+            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Create</TabsTrigger>
+            <TabsTrigger value="queue" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Queue</TabsTrigger>
+            <TabsTrigger value="accounts" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Accounts</TabsTrigger>
           </TabsList>
 
           {/* Create Tab */}
@@ -333,12 +333,12 @@ export default function WorkspacePage() {
               {/* Step 1: Source Material */}
               <div className="relative pl-8">
                 <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-blue-100 border-2 border-blue-600 flex items-center justify-center text-blue-600 font-bold text-xs dark:bg-blue-950 z-10">1</div>
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">1</div>
                 
-                <Card className="border shadow-sm hover:shadow-md transition-shadow">
+                <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <LinkIcon className="w-5 h-5 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <LinkIcon className="w-5 h-5 text-purple-500" />
                       Source Material
                     </CardTitle>
                     <CardDescription>
@@ -347,34 +347,34 @@ export default function WorkspacePage() {
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="source-url" className="font-semibold text-slate-700 dark:text-slate-300">YouTube Video URL <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="source-url" className="font-semibold text-gray-300">YouTube Video URL <span className="text-red-500">*</span></Label>
                       <Input
                         id="source-url"
                         placeholder="https://www.youtube.com/watch?v=..."
                         value={sourceUrl}
                         onChange={(e) => setSourceUrl(e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-900 border-slate-200 focus-visible:ring-blue-500"
+                        className="bg-black/40 border-white/10 focus-visible:ring-purple-500 text-white"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="start-time" className="font-semibold text-slate-700 dark:text-slate-300">Start Time</Label>
+                        <Label htmlFor="start-time" className="font-semibold text-gray-300">Start Time</Label>
                         <Input
                           id="start-time"
                           placeholder="00:00"
                           value={startTimestamp}
                           onChange={(e) => setStartTimestamp(e.target.value)}
-                          className="bg-slate-50 dark:bg-slate-900 border-slate-200 font-mono"
+                          className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="end-time" className="font-semibold text-slate-700 dark:text-slate-300">End Time</Label>
+                        <Label htmlFor="end-time" className="font-semibold text-gray-300">End Time</Label>
                         <Input
                           id="end-time"
                           placeholder="00:45"
                           value={endTimestamp}
                           onChange={(e) => setEndTimestamp(e.target.value)}
-                          className="bg-slate-50 dark:bg-slate-900 border-slate-200 font-mono"
+                          className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
                         />
                       </div>
                     </div>
@@ -385,12 +385,12 @@ export default function WorkspacePage() {
               {/* Step 2: AI Brain */}
               <div className="relative pl-8">
                 <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-100 border-2 border-purple-600 flex items-center justify-center text-purple-600 font-bold text-xs dark:bg-purple-950 z-10">2</div>
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">2</div>
                 
-                <Card className="border shadow-sm hover:shadow-md transition-shadow">
+                <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Sparkles className="w-5 h-5 text-purple-600" />
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <Sparkles className="w-5 h-5 text-purple-500" />
                       AI Brain & Script
                     </CardTitle>
                     <CardDescription>
@@ -399,42 +399,42 @@ export default function WorkspacePage() {
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="topic" className="font-semibold text-slate-700 dark:text-slate-300">Topic Idea <span className="text-xs font-normal text-slate-400 ml-2">(Optional - AI will generate a script)</span></Label>
+                      <Label htmlFor="topic" className="font-semibold text-gray-300">Topic Idea <span className="text-xs font-normal text-gray-500 ml-2">(Optional - AI will generate a script)</span></Label>
                       <Input
                         id="topic"
                         placeholder="e.g., Amazing space facts, The history of Rome..."
                         value={topicInput}
                         onChange={(e) => setTopicInput(e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-900 border-slate-200"
+                        className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
                       />
                     </div>
                     
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+                        <span className="w-full border-t border-white/10" />
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground font-medium">Or</span>
+                        <span className="bg-[#0F0A19] px-2 text-gray-500 font-medium">Or</span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="script" className="font-semibold text-slate-700 dark:text-slate-300">Custom Script <span className="text-xs font-normal text-slate-400 ml-2">(Overrides topic)</span></Label>
+                      <Label htmlFor="script" className="font-semibold text-gray-300">Custom Script <span className="text-xs font-normal text-gray-500 ml-2">(Overrides topic)</span></Label>
                       <Textarea
                         id="script"
                         placeholder="Write your exact script here..."
                         rows={4}
                         value={scriptInput}
                         onChange={(e) => setScriptInput(e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-900 border-slate-200 resize-none"
+                        className="bg-black/40 border-white/10 resize-none text-white focus-visible:ring-purple-500"
                       />
                     </div>
 
                     <div className="space-y-2 pt-2">
-                      <Label htmlFor="voice" className="font-semibold text-slate-700 dark:text-slate-300">AI Voice Model</Label>
+                      <Label htmlFor="voice" className="font-semibold text-gray-300">AI Voice Model</Label>
                       <select
                         id="voice"
-                        className="w-full px-3 py-2.5 border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                        className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
                         value={voiceName}
                         onChange={(e) => setVoiceName(e.target.value)}
                       >
@@ -450,12 +450,12 @@ export default function WorkspacePage() {
 
               {/* Step 3: Destinations */}
               <div className="relative pl-8">
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-emerald-100 border-2 border-emerald-600 flex items-center justify-center text-emerald-600 font-bold text-xs dark:bg-emerald-950 z-10">3</div>
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">3</div>
                 
-                <Card className="border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-                  <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Send className="w-5 h-5 text-emerald-600" />
+                <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                  <CardHeader className="bg-black/20 border-b border-white/5">
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <Send className="w-5 h-5 text-emerald-500" />
                       Destinations <span className="text-red-500">*</span>
                     </CardTitle>
                     <CardDescription>
@@ -497,27 +497,27 @@ export default function WorkspacePage() {
                     ) : (
                       <div className="grid sm:grid-cols-2 gap-4">
                         {accounts.map((account) => (
-                          <div
-                            key={account.id}
-                            className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                              selectedAccounts.includes(account.id)
-                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 shadow-sm'
-                                : 'border-slate-200 hover:border-emerald-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700'
-                            }`}
-                            onClick={() => toggleAccount(account.id)}
-                          >
-                            <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm">
+                            <div
+                              key={account.id}
+                              className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                selectedAccounts.includes(account.id)
+                                  ? 'border-purple-500 bg-purple-500/10 shadow-sm'
+                                  : 'border-white/10 hover:border-purple-500/50 hover:bg-white/5'
+                              }`}
+                              onClick={() => toggleAccount(account.id)}
+                            >
+                              <div className="bg-black/40 p-2 rounded-full shadow-sm">
                               {getPlatformIcon(account.platform)}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-sm truncate">{account.platform_username || 'Channel'}</p>
                               <p className="text-xs text-muted-foreground capitalize">{account.platform}</p>
                             </div>
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${
-                              selectedAccounts.includes(account.id)
-                                ? 'bg-emerald-500 border-emerald-500 text-white'
-                                : 'border-slate-300'
-                            }`}>
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${
+                                selectedAccounts.includes(account.id)
+                                  ? 'bg-purple-500 border-purple-500 text-white'
+                                  : 'border-white/20'
+                              }`}>
                               {selectedAccounts.includes(account.id) && <CheckCircle className="w-4 h-4" />}
                             </div>
                           </div>
@@ -525,10 +525,10 @@ export default function WorkspacePage() {
                       </div>
                     )}
 
-                    <div className="mt-8 pt-6 border-t flex items-center justify-between">
+                    <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
                       <div>
-                        <Label htmlFor="auto-schedule" className="text-base font-semibold text-slate-800 dark:text-slate-200">Auto-Schedule</Label>
-                        <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                        <Label htmlFor="auto-schedule" className="text-base font-semibold text-white">Auto-Schedule</Label>
+                        <p className="text-sm text-gray-400 mt-1 max-w-md">
                           Automatically assign this video to the next available slot based on your Schedule Planner.
                         </p>
                       </div>
@@ -536,7 +536,7 @@ export default function WorkspacePage() {
                         id="auto-schedule"
                         checked={autoSchedule}
                         onCheckedChange={setAutoSchedule}
-                        className="data-[state=checked]:bg-emerald-500"
+                        className="data-[state=checked]:bg-purple-500"
                       />
                     </div>
                   </CardContent>
@@ -548,9 +548,9 @@ export default function WorkspacePage() {
 
           {/* Queue Tab */}
           <TabsContent value="queue">
-            <Card className="border shadow-sm">
-              <CardHeader className="border-b bg-slate-50/50 dark:bg-slate-900/50">
-                <CardTitle>Video Queue</CardTitle>
+            <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
+              <CardHeader className="border-b border-white/5 bg-black/20">
+                <CardTitle className="text-white">Video Queue</CardTitle>
                 <CardDescription>
                   Track all your videos in the processing pipeline
                 </CardDescription>
@@ -559,11 +559,11 @@ export default function WorkspacePage() {
                 <ScrollArea className="h-[600px]">
                   <div className="p-4">
                     {videos.length === 0 ? (
-                      <div className="text-center py-20 text-muted-foreground">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                      <div className="text-center py-20 text-gray-500">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-black/40 mb-4">
                           <Video className="w-8 h-8 opacity-50" />
                         </div>
-                        <p className="font-medium text-lg text-slate-700 dark:text-slate-300">Queue is empty</p>
+                        <p className="font-medium text-lg text-gray-300">Queue is empty</p>
                         <p className="text-sm mt-1">Create your first automated video to see it here.</p>
                       </div>
                     ) : (
@@ -571,13 +571,13 @@ export default function WorkspacePage() {
                         {videos.map((video) => (
                           <div
                             key={video.id}
-                            className="p-5 rounded-xl border bg-card hover:shadow-md transition-all group"
+                            className="p-5 rounded-xl border border-white/10 bg-black/40 hover:bg-black/60 hover:shadow-md transition-all group"
                           >
                             <div className="flex items-start justify-between gap-4">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3 mb-2">
                                   {getStatusBadge(video.status as VideoStatus)}
-                                  <span className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                                  <span className="font-medium text-white truncate">
                                     {video.auto_generated_title || 'Generating Title...'}
                                   </span>
                                 </div>
@@ -589,7 +589,7 @@ export default function WorkspacePage() {
                                 </div>
                                 
                                 {video.scheduled_for && (
-                                  <div className="flex items-center gap-2 mt-3 text-sm text-cyan-600 bg-cyan-50 dark:bg-cyan-950/30 px-3 py-1.5 rounded-md w-fit">
+                                  <div className="flex items-center gap-2 mt-3 text-sm text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-md w-fit border border-cyan-500/20">
                                     <Calendar className="w-4 h-4" />
                                     <span className="font-medium">Scheduled for {new Date(video.scheduled_for).toLocaleString()}</span>
                                   </div>
@@ -601,22 +601,22 @@ export default function WorkspacePage() {
                                       <span>Progress</span>
                                       <span>{video.processing_progress}%</span>
                                     </div>
-                                    <Progress value={video.processing_progress} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                                    <Progress value={video.processing_progress} className="h-2 bg-white/10" />
                                   </div>
                                 )}
                                 
                                 {video.status === 'failed' && video.error_message && (
-                                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 rounded-md text-sm border border-red-100 dark:border-red-900">
+                                  <div className="mt-3 p-3 bg-red-500/10 text-red-400 rounded-md text-sm border border-red-500/20">
                                     <strong>Error:</strong> {video.error_message}
                                   </div>
                                 )}
                                 
                                 {video.status === 'posted' && (
-                                  <div className="mt-3 text-sm text-emerald-600 flex items-center gap-1.5">
+                                  <div className="mt-3 text-sm text-emerald-400 flex items-center gap-1.5">
                                     <CheckCircle className="w-4 h-4" />
                                     Posted on {new Date(video.posted_at!).toLocaleDateString()}
                                     {(video as any).metadata?.sandbox_mode && (
-                                      <Badge variant="secondary" className="ml-2 text-[10px] bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none">SANDBOX</Badge>
+                                      <Badge variant="secondary" className="ml-2 text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">SANDBOX</Badge>
                                     )}
                                   </div>
                                 )}
@@ -666,9 +666,9 @@ export default function WorkspacePage() {
           {/* Accounts Tab */}
           <TabsContent value="accounts">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border shadow-sm">
-                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
+                <CardHeader className="bg-black/20 border-b border-white/5">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Youtube className="w-5 h-5 text-red-500" />
                     YouTube Channels
                   </CardTitle>
@@ -678,17 +678,17 @@ export default function WorkspacePage() {
                     <p className="text-center text-muted-foreground py-4 text-sm">No YouTube channels linked.</p>
                   )}
                   {accounts.filter(a => a.platform === 'youtube').map((account) => (
-                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-slate-950 shadow-sm hover:border-red-200 transition-colors">
+                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-black/40 shadow-sm hover:border-red-500/50 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-50 dark:bg-red-950/30 rounded-full">
+                        <div className="p-2 bg-red-500/10 rounded-full">
                           <Youtube className="w-5 h-5 text-red-500" />
                         </div>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200">{account.platform_username}</span>
+                        <span className="font-semibold text-white">{account.platform_username}</span>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-slate-400 hover:text-red-500 hover:bg-red-50"
+                        className="text-gray-400 hover:text-red-400 hover:bg-red-500/10"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
@@ -712,9 +712,9 @@ export default function WorkspacePage() {
                 </CardContent>
               </Card>
 
-              <Card className="border shadow-sm">
-                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
+                <CardHeader className="bg-black/20 border-b border-white/5">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <Instagram className="w-5 h-5 text-pink-500" />
                     Instagram Accounts
                   </CardTitle>
@@ -724,17 +724,17 @@ export default function WorkspacePage() {
                     <p className="text-center text-muted-foreground py-4 text-sm">No Instagram accounts linked.</p>
                   )}
                   {accounts.filter(a => a.platform === 'instagram').map((account) => (
-                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-slate-950 shadow-sm hover:border-pink-200 transition-colors">
+                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-black/40 shadow-sm hover:border-pink-500/50 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-pink-50 dark:bg-pink-950/30 rounded-full">
+                        <div className="p-2 bg-pink-500/10 rounded-full">
                           <Instagram className="w-5 h-5 text-pink-500" />
                         </div>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200">{account.platform_username}</span>
+                        <span className="font-semibold text-white">{account.platform_username}</span>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-slate-400 hover:text-pink-500 hover:bg-pink-50"
+                        className="text-gray-400 hover:text-pink-400 hover:bg-pink-500/10"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
@@ -790,7 +790,7 @@ export default function WorkspacePage() {
           >
             {submitting ? (
               <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                <div className="w-5 h-5 mr-2 flex items-center justify-center"><div className="loader scale-[0.25]"></div></div>
                 Processing Pipeline...
               </>
             ) : (

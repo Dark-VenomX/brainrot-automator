@@ -26,19 +26,19 @@ import Link from 'next/link';
 
 export default function HowToUsePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900">
+    <div className="min-h-screen text-gray-300">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-lg dark:bg-gray-900/80 sticky top-0 z-50">
+      <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/workspace" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Workspace
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
               <Video className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Brainrot Studio</span>
+            <span className="text-xl font-bold text-white tracking-tight">brainrot.ai</span>
           </div>
         </div>
       </header>
@@ -46,17 +46,17 @@ export default function HowToUsePage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <Badge className="mb-4" variant="secondary">Getting Started</Badge>
-          <h1 className="text-4xl font-bold mb-4">How to Use Brainrot Studio</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <Badge className="mb-4 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border-0" variant="secondary">Getting Started</Badge>
+          <h1 className="text-4xl font-bold mb-4 text-white">How to Use brainrot.ai</h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             A complete guide to automating your short-form video creation and multi-platform posting
           </p>
         </div>
 
         {/* Quick Start */}
-        <Card className="border-0 shadow-lg mb-8">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <Zap className="w-5 h-5 text-yellow-500" />
               Quick Start (5 Steps)
             </CardTitle>
@@ -90,7 +90,7 @@ export default function HowToUsePage() {
         {/* Detailed Guide */}
         <div className="space-y-8">
           {/* Step 1: Account Setup */}
-          <Card className="border-0 shadow-lg">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
@@ -143,7 +143,7 @@ export default function HowToUsePage() {
           </Card>
 
           {/* Step 2: Creating Videos */}
-          <Card className="border-0 shadow-lg">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
@@ -234,7 +234,7 @@ export default function HowToUsePage() {
           </Card>
 
           {/* Step 3: Target Accounts */}
-          <Card className="border-0 shadow-lg">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900 flex items-center justify-center">
@@ -274,7 +274,7 @@ export default function HowToUsePage() {
           </Card>
 
           {/* Step 4: Processing Pipeline */}
-          <Card className="border-0 shadow-lg">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
@@ -346,7 +346,7 @@ export default function HowToUsePage() {
           </Card>
 
           {/* Step 5: Scheduling */}
-          <Card className="border-0 shadow-lg">
+        <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">

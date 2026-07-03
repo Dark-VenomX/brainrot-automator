@@ -352,7 +352,7 @@ export default function BrainrotLandingPage() {
 
         /* Features */
         #features {
-          position: relative; z-index: 10; padding: 6rem 2.5rem; background: #06040A; display: flex; flex-direction: column; align-items: center;
+          position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center;
         }
         .section-title {
           font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 4rem; text-align: center;
@@ -395,7 +395,7 @@ export default function BrainrotLandingPage() {
 
         /* Pricing */
         #pricing {
-          position: relative; z-index: 10; padding: 6rem 2.5rem; background: #06040A; display: flex; flex-direction: column; align-items: center;
+          position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center;
         }
         .pricing-grid {
           display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 60rem; width: 100%;
@@ -428,7 +428,7 @@ export default function BrainrotLandingPage() {
 
         /* Footer */
         footer {
-          position: relative; z-index: 10; background: #06040A; border-top: 1px solid rgba(255, 255, 255, 0.05);
+          position: relative; z-index: 10; background: transparent; border-top: 1px solid rgba(255, 255, 255, 0.05);
           padding: 3rem 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center;
         }
         footer p { color: #6b7280; font-size: 0.875rem; }
