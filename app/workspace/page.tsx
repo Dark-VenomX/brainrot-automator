@@ -90,17 +90,6 @@ export default function WorkspacePage() {
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [autoSchedule, setAutoSchedule] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading) {
-      if (session?.access_token) {
-        apiClient.setAccessToken(session.access_token);
-        loadData();
-      } else {
-        router.push('/login');
-      }
-    }
-  }, [session, authLoading, router, loadData]);
-
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -116,6 +105,17 @@ export default function WorkspacePage() {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (session?.access_token) {
+        apiClient.setAccessToken(session.access_token);
+        loadData();
+      } else {
+        router.push('/login');
+      }
+    }
+  }, [session, authLoading, router, loadData]);
 
   // Poll for updates on processing videos
   useEffect(() => {
