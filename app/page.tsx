@@ -72,7 +72,7 @@ export default function BrainrotLandingPage() {
       <style dangerouslySetInnerHTML={{ __html: `
         .veldara-theme {
           font-family: var(--font-inter), 'Inter', sans-serif; 
-          background: #06040A; 
+          background: transparent; 
           color: #fff;
           min-height: 100vh;
         }
@@ -82,23 +82,6 @@ export default function BrainrotLandingPage() {
         .veldara-theme .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
         
         .veldara-theme section { scroll-margin-top: 80px; }
-
-        /* Scroll Video */
-        #scroll-video-container {
-          position: fixed; inset: 0; z-index: 0;
-          background: #06040A; top: -20%;
-        }
-        #scroll-video-container canvas,
-        #scroll-video-container video {
-          position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-        }
-        #scroll-video-container .overlay { position: absolute; inset: 0; background: rgba(6, 4, 10, 0.4); }
-
-        /* Particles */
-        #particles-canvas {
-          position: fixed; inset: 0; width: 100%; height: 100%;
-          pointer-events: none; z-index: 3;
-        }
 
         /* Nav */
         .veldara-theme nav {
@@ -123,7 +106,7 @@ export default function BrainrotLandingPage() {
         }
         #hero .gradient-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(to top, #06040A 10%, transparent 80%);
+          background: linear-gradient(to top, rgba(6, 4, 10, 0.8) 0%, transparent 50%);
         }
         #hero .content {
           position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column;

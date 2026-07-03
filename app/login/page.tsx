@@ -53,7 +53,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 p-12 flex-col justify-between">
+      <div className="hidden lg:flex lg:w-1/2 bg-black/40 backdrop-blur-md border-r border-white/10 p-12 flex-col justify-between relative z-10">
         <div>
           <Link href="/" className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity w-fit cursor-pointer">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
@@ -67,36 +67,36 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold text-white leading-tight">
             Automate Your Short-Form Video Creation
           </h1>
-          <p className="text-lg text-blue-100">
+          <p className="text-lg text-gray-300">
             AI-powered script writing, voice synthesis, and multi-platform scheduling.
             Create viral content at scale with zero production costs.
           </p>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur">
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
               <Zap className="w-8 h-8 text-yellow-400" />
               <div>
                 <h3 className="font-semibold text-white">AI Script Generation</h3>
-                <p className="text-sm text-blue-100">Free Gemini-powered script writing</p>
+                <p className="text-sm text-gray-400">Free Gemini-powered script writing</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur">
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
               <Calendar className="w-8 h-8 text-green-400" />
               <div>
                 <h3 className="font-semibold text-white">Smart Scheduling</h3>
-                <p className="text-sm text-blue-100">Auto-post at optimal times</p>
+                <p className="text-sm text-gray-400">Auto-post at optimal times</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 backdrop-blur">
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur">
               <div className="flex -space-x-2">
                 <Youtube className="w-8 h-8 text-red-500" />
                 <Instagram className="w-8 h-8 text-pink-500" />
               </div>
               <div>
                 <h3 className="font-semibold text-white">Multi-Account Matrix</h3>
-                <p className="text-sm text-blue-100">Post to all your channels</p>
+                <p className="text-sm text-gray-400">Post to all your channels</p>
               </div>
             </div>
           </div>
