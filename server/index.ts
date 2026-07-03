@@ -91,10 +91,11 @@ app.get('/api/oauth/youtube/callback', async (req: Request, res: Response) => {
       { thumbnail: channelInfo.thumbnailUrl },
     );
 
-    res.redirect(`${process.env.FRONTEND_URL}/settings?linked=youtube`);
-  } catch (error) {
+    res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?linked=youtube`);
+  } catch (error: any) {
     logger.error(`YouTube OAuth callback error: ${error}`);
-    res.redirect(`${process.env.FRONTEND_URL}/settings?error=youtube_link_failed`);
+    const msg = error?.message || String(error);
+    res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?error=youtube_link_failed&message=${encodeURIComponent(msg)}`);
   }
 });
 
@@ -123,10 +124,10 @@ app.get('/api/oauth/instagram/callback', async (req: Request, res: Response) => 
       tokens,
     );
 
-    res.redirect(`${process.env.FRONTEND_URL}/settings?linked=instagram`);
+    res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?linked=instagram`);
   } catch (error) {
     logger.error(`Instagram OAuth callback error: ${error}`);
-    res.redirect(`${process.env.FRONTEND_URL}/settings?error=instagram_link_failed`);
+    res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?error=instagram_link_failed`);
   }
 });
 
