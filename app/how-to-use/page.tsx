@@ -26,7 +26,7 @@ import Link from 'next/link';
 
 export default function HowToUsePage() {
   return (
-    <div className="min-h-screen text-gray-300">
+    <div className="min-h-screen text-white pb-24">
       {/* Header */}
       <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -34,9 +34,9 @@ export default function HowToUsePage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Workspace
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
-              <Video className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow-md">
+              <Video className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-white tracking-tight">brainrot.ai</span>
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { apiClient, type VideoQueueItem, type SocialAccount } from '../../lib/api';
 import { Button } from '../../components/ui/button';
@@ -71,7 +72,8 @@ const statusConfig: Record<VideoStatus, { label: string; color: string; icon: Re
 };
 
 export default function WorkspacePage() {
-  const { user, signOut, session } = useAuth();
+  const { user, signOut, session, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [accounts, setAccounts] = useState<SocialAccount[]>([]);
   const [videos, setVideos] = useState<VideoQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,11 +91,15 @@ export default function WorkspacePage() {
   const [autoSchedule, setAutoSchedule] = useState(false);
 
   useEffect(() => {
-    if (session?.access_token) {
-      apiClient.setAccessToken(session.access_token);
-      loadData();
+    if (!authLoading) {
+      if (session?.access_token) {
+        apiClient.setAccessToken(session.access_token);
+        loadData();
+      } else {
+        router.push('/login');
+      }
     }
-  }, [session]);
+  }, [session, authLoading, router, loadData]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -239,17 +245,15 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div className="min-h-screen text-gray-300 pb-24">
+    <div className="min-h-screen text-white pb-24">
       {/* Header */}
       <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
-              <Video className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
+              <Video className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight">
-              brainrot.ai
-            </h1>
+            <span className="text-xl font-bold text-white tracking-tight">brainrot.ai</span>
           </div>
           <div className="flex items-center gap-2">
             <SchedulePlanner onSaved={() => setTrackerRefreshKey(k => k + 1)} />

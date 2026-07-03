@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Video, Zap, Calendar, Youtube, Instagram } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { signIn, signUp, loading, user } = useAuth();
@@ -54,12 +55,12 @@ export default function LoginPage() {
       {/* Left Side - Hero */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 p-12 flex-col justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
-              <Video className="w-7 h-7 text-white" />
+          <Link href="/" className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity w-fit cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
+              <Video className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">Brainrot Studio</span>
-          </div>
+            <span className="text-2xl font-bold text-white tracking-tight">brainrot.ai</span>
+          </Link>
         </div>
 
         <div className="space-y-8">

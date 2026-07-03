@@ -62,6 +62,10 @@ const requireAuth = async (req, res, next) => {
 // =====================
 // OAuth Routes
 // =====================
+app.get('/api/oauth/test', (req, res) => {
+    const authUrl = oauth_1.oauthService.getYouTubeAuthUrl('test_state');
+    res.send(`<a href="${authUrl}">Click to test OAuth</a><br><br><pre>${authUrl}</pre>`);
+});
 app.get('/api/oauth/youtube', requireAuth, (req, res) => {
     const state = req.user.id;
     const authUrl = oauth_1.oauthService.getYouTubeAuthUrl(state);
@@ -76,11 +80,12 @@ app.get('/api/oauth/youtube/callback', async (req, res) => {
         const tokens = await oauth_1.oauthService.handleYouTubeCallback(code);
         const channelInfo = await oauth_1.oauthService.getYouTubeChannelInfo(tokens.access_token);
         await oauth_1.oauthService.linkAccount(userId, 'youtube', channelInfo.id, channelInfo.title, tokens, { thumbnail: channelInfo.thumbnailUrl });
-        res.redirect(`${process.env.FRONTEND_URL}/settings?linked=youtube`);
+        res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?linked=youtube`);
     }
     catch (error) {
         logger_1.default.error(`YouTube OAuth callback error: ${error}`);
-        res.redirect(`${process.env.FRONTEND_URL}/settings?error=youtube_link_failed`);
+        const msg = error?.message || String(error);
+        res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?error=youtube_link_failed&message=${encodeURIComponent(msg)}`);
     }
 });
 app.get('/api/oauth/instagram', requireAuth, (req, res) => {
@@ -97,11 +102,11 @@ app.get('/api/oauth/instagram/callback', async (req, res) => {
         const tokens = await oauth_1.oauthService.handleInstagramCallback(code);
         const accountInfo = await oauth_1.oauthService.getInstagramAccountInfo(tokens.access_token);
         await oauth_1.oauthService.linkAccount(userId, 'instagram', accountInfo.id, accountInfo.username, tokens);
-        res.redirect(`${process.env.FRONTEND_URL}/settings?linked=instagram`);
+        res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?linked=instagram`);
     }
     catch (error) {
         logger_1.default.error(`Instagram OAuth callback error: ${error}`);
-        res.redirect(`${process.env.FRONTEND_URL}/settings?error=instagram_link_failed`);
+        res.redirect(`${process.env.FRONTEND_URL || ''}/workspace?error=instagram_link_failed`);
     }
 });
 app.get('/api/accounts', requireAuth, async (req, res) => {
