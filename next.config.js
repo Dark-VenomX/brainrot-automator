@@ -13,16 +13,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/videos/:path*',
-        destination: `${process.env.API_URL || 'http://localhost:3001'}/api/videos/:path*`,
-      },
-      {
-        source: '/api/accounts/:path*',
-        destination: `${process.env.API_URL || 'http://localhost:3001'}/api/accounts/:path*`,
-      },
-      {
-        source: '/api/scheduler/:path*',
-        destination: `${process.env.API_URL || 'http://localhost:3001'}/api/scheduler/:path*`,
+        source: '/api/:path*',
+        destination: `${process.env.API_URL || 'http://localhost:3001'}/api/:path*`,
       },
     ];
   },
