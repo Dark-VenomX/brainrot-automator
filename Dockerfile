@@ -87,7 +87,7 @@ RUN echo '[supervisord]' > /etc/supervisor/conf.d/brainrot.conf && \
     echo 'nodaemon=true' >> /etc/supervisor/conf.d/brainrot.conf && \
     echo '' >> /etc/supervisor/conf.d/brainrot.conf && \
     echo '[program:nextjs]' >> /etc/supervisor/conf.d/brainrot.conf && \
-    echo 'command=npm run start:next' >> /etc/supervisor/conf.d/brainrot.conf && \
+    echo 'command=/bin/sh -c "npm run start:next -- -p ${PORT:-3000}"' >> /etc/supervisor/conf.d/brainrot.conf && \
     echo 'directory=/app' >> /etc/supervisor/conf.d/brainrot.conf && \
     echo 'autostart=true' >> /etc/supervisor/conf.d/brainrot.conf && \
     echo 'autorestart=true' >> /etc/supervisor/conf.d/brainrot.conf && \
