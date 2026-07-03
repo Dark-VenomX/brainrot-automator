@@ -10,8 +10,8 @@ import logger from '../utils/logger';
 
 const execAsync = util.promisify(exec);
 
-// Use the local python pip installed yt-dlp
-const YT_DLP_PATH = path.join(process.env.HOME || '/root', '.local/bin/yt-dlp');
+// Use yt-dlp from PATH since it's installed globally via pip in Docker
+const YT_DLP_PATH = 'yt-dlp';
 
 // Set paths for ffmpeg and ffprobe
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
