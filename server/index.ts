@@ -14,7 +14,8 @@ import { normalizeSchedulerSettings, type SchedulerSettings } from './types';
 import logger from './utils/logger';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+// Ignore Render's PORT variable (which Next.js uses) and bind to an internal port
+const PORT = process.env.API_PORT || 3001;
 
 app.use(cors({
   origin: (origin, callback) => {
