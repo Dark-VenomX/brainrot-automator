@@ -232,8 +232,9 @@ export default function BrainrotLandingPage() {
 
         /* Responsive */
         @media (max-width: 768px) {
-          .veldara-theme nav { padding: 1rem 1.5rem; }
-          .veldara-theme nav .nav-links { display: none; }
+          .veldara-theme nav { padding: 1rem; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+          .veldara-theme nav .nav-links { font-size: 0.85rem; gap: 1rem; justify-content: center; width: 100%; }
+          .veldara-theme nav .social { display: none; }
           #hero .content { padding-bottom: 5rem; }
           #hero h1 { font-size: 1.75rem; }
           #hero .ctas { flex-direction: column; width: 100%; }

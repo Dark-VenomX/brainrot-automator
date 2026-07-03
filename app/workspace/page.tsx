@@ -39,7 +39,9 @@ import {
   Settings,
   Calendar,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Zap,
+  BookOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SelfSufficiencyTracker } from '../../components/self-sufficiency-tracker';
@@ -249,15 +251,21 @@ export default function WorkspacePage() {
       {/* Header */}
       <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
               <Video className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-white tracking-tight">brainrot.ai</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <SchedulePlanner onSaved={() => setTrackerRefreshKey(k => k + 1)} />
             <SandboxPanel />
+            <Link href="/how-to-use">
+              <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Docs
+              </Button>
+            </Link>
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
