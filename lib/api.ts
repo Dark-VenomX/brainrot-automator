@@ -1,6 +1,7 @@
 import type { VideoStatus } from './database.types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+// Always use relative URLs so Next.js rewrites can proxy to the backend
+const API_URL = '';
 
 interface VideoQueueItem {
   id: string;
