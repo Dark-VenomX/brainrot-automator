@@ -1,0 +1,175 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.whisperService = exports.ttsService = exports.aiService = exports.WhisperService = exports.TTSService = exports.AIService = void 0;
+const generative_ai_1 = require("@google/generative-ai");
+const child_process_1 = require("child_process");
+const util_1 = require("util");
+const promises_1 = __importDefault(require("fs/promises"));
+const path_1 = __importDefault(require("path"));
+const logger_1 = __importDefault(require("../utils/logger"));
+const execAsync = (0, util_1.promisify)(child_process_1.exec);
+const GEMINI_RPM_LIMIT = 15;
+const GEMINI_WINDOW_MS = 60 * 1000;
+let requestTimestamps = [];
+function cleanOldTimestamps() {
+    const now = Date.now();
+    requestTimestamps = requestTimestamps.filter(ts => now - ts < GEMINI_WINDOW_MS);
+}
+async function waitForRateLimit() {
+    cleanOldTimestamps();
+    if (requestTimestamps.length >= GEMINI_RPM_LIMIT) {
+        const oldestRequest = requestTimestamps[0];
+        const waitTime = GEMINI_WINDOW_MS - (Date.now() - oldestRequest) + 100;
+        logger_1.default.info(`Rate limit reached. Waiting ${waitTime}ms before next Gemini request`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        cleanOldTimestamps();
+    }
+    requestTimestamps.push(Date.now());
+}
+class AIService {
+    constructor(apiKey) {
+        this.genAI = null;
+        this.model = null;
+        this.initialized = false;
+        this.apiKey = apiKey || process.env.GEMINI_API_KEY || '';
+        if (this.apiKey) {
+            this.init();
+        }
+    }
+    init() {
+        if (this.initialized)
+            return;
+        this.genAI = new generative_ai_1.GoogleGenerativeAI(this.apiKey);
+        this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        this.initialized = true;
+        logger_1.default.info('Gemini AI service initialized');
+    }
+    setApiKey(apiKey) {
+        this.apiKey = apiKey;
+        this.initialized = false;
+        this.init();
+    }
+    async generateScript(topic, videoContext) {
+        if (!this.model)
+            this.init();
+        await waitForRateLimit();
+        const systemPrompt = `You are an expert scriptwriter for short-form viral videos (YouTube Shorts, Instagram Reels, TikTok).
+Your scripts are designed for maximum retention and engagement.
+
+RULES:
+1. The script MUST be exactly 40-50 seconds when read at a normal pace (approximately 120 words)
+2. Hook the viewer in the first 3 seconds
+3. Use simple, conversational language
+4. Include a clear call-to-action at the end
+5. NO emojis or special characters - only plain text
+6. NO questions or prompts like "Have you ever..." - make definitive statements
+
+${videoContext ? `Context from video: ${videoContext}` : ''}
+
+OUTPUT FORMAT (respond with ONLY this JSON, no markdown):
+{
+  "script": "Your script here as plain text",
+  "title": "A catchy title under 60 characters",
+  "hashtags": ["tag1", "tag2", "tag3"]
+}`;
+        try {
+            const result = await this.model.generateContent([
+                { text: systemPrompt },
+                { text: `Write a script about: ${topic}` },
+            ]);
+            const response = result.response.text();
+            const jsonMatch = response.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                logger_1.default.info(`Generated script for topic: ${topic}`);
+                return parsed;
+            }
+            throw new Error('Could not parse Gemini response as JSON');
+        }
+        catch (error) {
+            logger_1.default.error(`Script generation failed: ${error}`);
+            throw error;
+        }
+    }
+    async generateMetadata(script, topic) {
+        if (!this.model)
+            this.init();
+        await waitForRateLimit();
+        const prompt = `Given this video script, generate a catchy title (under 60 characters) and exactly 3 relevant hashtags.
+
+Script: "${script}"
+${topic ? `Topic: ${topic}` : ''}
+
+Respond with ONLY this JSON format:
+{
+  "title": "Your title here",
+  "hashtags": ["tag1", "tag2", "tag3"]
+}`;
+        try {
+            const result = await this.model.generateContent(prompt);
+            const response = result.response.text();
+            const jsonMatch = response.match(/\{[\s\S]*\}/);
+            if (jsonMatch)
+                return JSON.parse(jsonMatch[0]);
+            return { title: topic || 'Check this out!', hashtags: ['viral', 'trending', 'fyp'] };
+        }
+        catch (error) {
+            logger_1.default.error(`Metadata generation failed: ${error}`);
+            return { title: topic || 'Check this out!', hashtags: ['viral', 'trending', 'fyp'] };
+        }
+    }
+}
+exports.AIService = AIService;
+class TTSService {
+    constructor(tempDir) {
+        this.tempDir = tempDir || process.env.TEMP_DIR || path_1.default.join(process.cwd(), 'temp');
+    }
+    async generateSpeech(text, voice = 'en-US-AriaNeural', outputPath) {
+        // STUB: edge-tts CLI is not installed in this preview environment.
+        // When deploying with Docker, the real implementation uses:
+        //   edge-tts --voice "..." --text "..." --write-to "..."
+        const cleanText = text.replace(/["\u201c\u201d]/g, '').replace(/['\u2018\u2019]/g, '').trim();
+        const outputFile = path_1.default.resolve(outputPath || path_1.default.join(this.tempDir, `tts_${Date.now()}.mp3`));
+        await promises_1.default.mkdir(path_1.default.dirname(outputFile), { recursive: true });
+        // Write a placeholder file so downstream code can detect it
+        await promises_1.default.writeFile(outputFile, Buffer.from('TTS_STUB'));
+        logger_1.default.warn(`[STUB] TTS generated placeholder: ${outputFile}`);
+        return outputFile;
+    }
+    async getAvailableVoices(language = 'en') {
+        return [
+            'en-US-AriaNeural',
+            'en-US-GuyNeural',
+            'en-GB-SoniaNeural',
+            'en-AU-NatashaNeural',
+        ];
+    }
+}
+exports.TTSService = TTSService;
+class WhisperService {
+    constructor(tempDir, modelPath) {
+        this.tempDir = tempDir || process.env.TEMP_DIR || path_1.default.join(process.cwd(), 'temp');
+        this.modelPath = modelPath;
+    }
+    async transcribeWithTimestamps(_audioPath) {
+        // STUB: whisper CLI is not installed in this preview environment.
+        throw new Error('Whisper transcription is not available in this preview environment.');
+    }
+    async fallbackWordTimestamps(text, audioDurationMs) {
+        const words = text.split(/\s+/).filter(w => w.length > 0);
+        const wordDuration = audioDurationMs / Math.max(words.length, 1);
+        return words.map((word, idx) => ({
+            word: word.trim(),
+            start: Math.round(idx * wordDuration),
+            end: Math.round((idx + 1) * wordDuration),
+        }));
+    }
+}
+exports.WhisperService = WhisperService;
+exports.aiService = new AIService();
+exports.ttsService = new TTSService();
+exports.whisperService = new WhisperService();
+//# sourceMappingURL=ai.js.map
