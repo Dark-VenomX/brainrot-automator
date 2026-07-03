@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Progress } from '../../components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
@@ -39,6 +39,7 @@ import {
   Settings,
   Calendar,
   Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SelfSufficiencyTracker } from '../../components/self-sufficiency-tracker';
@@ -226,31 +227,43 @@ export default function WorkspacePage() {
     );
   };
 
+  const isFormValid = sourceUrl.trim() !== '' && selectedAccounts.length > 0;
+  const getDisabledReason = () => {
+    if (!sourceUrl.trim()) return "Missing Video URL";
+    if (selectedAccounts.length === 0) return "Select at least 1 Account";
+    return "";
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+          <p className="text-muted-foreground font-medium animate-pulse">Loading Workspace...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-lg dark:bg-gray-900/80 sticky top-0 z-50">
+      <header className="border-b bg-white/80 backdrop-blur-lg dark:bg-slate-900/80 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 shadow-md flex items-center justify-center">
               <Video className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold">Brainrot Studio</h1>
+            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
+              Brainrot Studio
+            </h1>
           </div>
           <div className="flex items-center gap-2">
             <SchedulePlanner onSaved={() => setTrackerRefreshKey(k => k + 1)} />
             <SandboxPanel />
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </Button>
@@ -269,7 +282,7 @@ export default function WorkspacePage() {
                       window.open(res.authUrl, '_blank');
                     }}
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-950/30 transition-all"
                   >
                     <Youtube className="w-5 h-5 mr-3 text-red-500" />
                     Link YouTube Channel
@@ -280,7 +293,7 @@ export default function WorkspacePage() {
                       window.open(res.authUrl, '_blank');
                     }}
                     variant="outline"
-                    className="w-full justify-start"
+                    className="w-full justify-start hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 dark:hover:bg-pink-950/30 transition-all"
                   >
                     <Instagram className="w-5 h-5 mr-3 text-pink-500" />
                     Link Instagram Account
@@ -301,140 +314,171 @@ export default function WorkspacePage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Self-Sufficiency Tracker — top of dashboard */}
-        <div className="mb-6">
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-8">
           <SelfSufficiencyTracker refreshKey={trackerRefreshKey} />
         </div>
 
-        <Tabs defaultValue="create" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="create">Create</TabsTrigger>
-            <TabsTrigger value="queue">Queue</TabsTrigger>
-            <TabsTrigger value="accounts">Accounts</TabsTrigger>
+        <Tabs defaultValue="create" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl">
+            <TabsTrigger value="create" className="rounded-lg data-[state=active]:shadow-sm">Create</TabsTrigger>
+            <TabsTrigger value="queue" className="rounded-lg data-[state=active]:shadow-sm">Queue</TabsTrigger>
+            <TabsTrigger value="accounts" className="rounded-lg data-[state=active]:shadow-sm">Accounts</TabsTrigger>
           </TabsList>
 
           {/* Create Tab */}
-          <TabsContent value="create">
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Video Input Form */}
-              <div className="lg:col-span-2 space-y-6">
-                <Card className="border-0 shadow-lg">
+          <TabsContent value="create" className="focus-visible:outline-none focus-visible:ring-0">
+            <div className="space-y-8 pb-12">
+              
+              {/* Step 1: Source Material */}
+              <div className="relative pl-8">
+                <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-blue-100 border-2 border-blue-600 flex items-center justify-center text-blue-600 font-bold text-xs dark:bg-blue-950 z-10">1</div>
+                
+                <Card className="border shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
                       <LinkIcon className="w-5 h-5 text-blue-600" />
-                      Video Source
+                      Source Material
                     </CardTitle>
                     <CardDescription>
-                      Enter a YouTube video URL and select the segment to use
+                      Where should we get the background gameplay from?
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="source-url">Video URL</Label>
+                      <Label htmlFor="source-url" className="font-semibold text-slate-700 dark:text-slate-300">YouTube Video URL <span className="text-red-500">*</span></Label>
                       <Input
                         id="source-url"
                         placeholder="https://www.youtube.com/watch?v=..."
                         value={sourceUrl}
                         onChange={(e) => setSourceUrl(e.target.value)}
+                        className="bg-slate-50 dark:bg-slate-900 border-slate-200 focus-visible:ring-blue-500"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="start-time">Start Time</Label>
+                        <Label htmlFor="start-time" className="font-semibold text-slate-700 dark:text-slate-300">Start Time</Label>
                         <Input
                           id="start-time"
                           placeholder="00:00"
                           value={startTimestamp}
                           onChange={(e) => setStartTimestamp(e.target.value)}
+                          className="bg-slate-50 dark:bg-slate-900 border-slate-200 font-mono"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="end-time">End Time</Label>
+                        <Label htmlFor="end-time" className="font-semibold text-slate-700 dark:text-slate-300">End Time</Label>
                         <Input
                           id="end-time"
                           placeholder="00:45"
                           value={endTimestamp}
                           onChange={(e) => setEndTimestamp(e.target.value)}
+                          className="bg-slate-50 dark:bg-slate-900 border-slate-200 font-mono"
                         />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+              </div>
 
-                <Card className="border-0 shadow-lg">
+              {/* Step 2: AI Brain */}
+              <div className="relative pl-8">
+                <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-100 border-2 border-purple-600 flex items-center justify-center text-purple-600 font-bold text-xs dark:bg-purple-950 z-10">2</div>
+                
+                <Card className="border shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5 text-purple-600" />
-                      Script Settings
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      AI Brain & Script
                     </CardTitle>
                     <CardDescription>
-                      AI will generate a script based on your topic, or provide your own
+                      Tell the AI what to talk about, or write your own script.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="topic">Topic (optional)</Label>
+                      <Label htmlFor="topic" className="font-semibold text-slate-700 dark:text-slate-300">Topic Idea <span className="text-xs font-normal text-slate-400 ml-2">(Optional - AI will generate a script)</span></Label>
                       <Input
                         id="topic"
-                        placeholder="e.g., Amazing space facts, Mind-blowing history..."
+                        placeholder="e.g., Amazing space facts, The history of Rome..."
                         value={topicInput}
                         onChange={(e) => setTopicInput(e.target.value)}
+                        className="bg-slate-50 dark:bg-slate-900 border-slate-200"
                       />
                     </div>
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground font-medium">Or</span>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="script">Custom Script (optional)</Label>
+                      <Label htmlFor="script" className="font-semibold text-slate-700 dark:text-slate-300">Custom Script <span className="text-xs font-normal text-slate-400 ml-2">(Overrides topic)</span></Label>
                       <Textarea
                         id="script"
-                        placeholder="Or write your own script here..."
+                        placeholder="Write your exact script here..."
                         rows={4}
                         value={scriptInput}
                         onChange={(e) => setScriptInput(e.target.value)}
+                        className="bg-slate-50 dark:bg-slate-900 border-slate-200 resize-none"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="voice">Voice</Label>
+
+                    <div className="space-y-2 pt-2">
+                      <Label htmlFor="voice" className="font-semibold text-slate-700 dark:text-slate-300">AI Voice Model</Label>
                       <select
                         id="voice"
-                        className="w-full px-3 py-2 border rounded-md bg-background"
+                        className="w-full px-3 py-2.5 border rounded-lg bg-slate-50 dark:bg-slate-900 border-slate-200 focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
                         value={voiceName}
                         onChange={(e) => setVoiceName(e.target.value)}
                       >
-                        <option value="en-US-AriaNeural">Aria (US Female)</option>
-                        <option value="en-US-GuyNeural">Guy (US Male)</option>
-                        <option value="en-GB-SoniaNeural">Sonia (UK Female)</option>
-                        <option value="en-AU-NatashaNeural">Natasha (AU Female)</option>
+                        <option value="en-US-AriaNeural">Aria (US Female - Cheerful)</option>
+                        <option value="en-US-GuyNeural">Guy (US Male - Professional)</option>
+                        <option value="en-GB-SoniaNeural">Sonia (UK Female - Clear)</option>
+                        <option value="en-AU-NatashaNeural">Natasha (AU Female - Energetic)</option>
                       </select>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Account Matrix */}
-              <div className="space-y-6">
-                <Card className="border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Send className="w-5 h-5 text-green-600" />
-                      Target Accounts
+              {/* Step 3: Destinations */}
+              <div className="relative pl-8">
+                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-emerald-100 border-2 border-emerald-600 flex items-center justify-center text-emerald-600 font-bold text-xs dark:bg-emerald-950 z-10">3</div>
+                
+                <Card className="border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                  <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Send className="w-5 h-5 text-emerald-600" />
+                      Destinations <span className="text-red-500">*</span>
                     </CardTitle>
                     <CardDescription>
-                      Select which channels to post to
+                      Select the accounts to publish this video to.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="p-6">
                     {accounts.length === 0 ? (
-                      <div className="text-center py-6 text-muted-foreground">
-                        <p className="mb-4">No accounts linked yet</p>
-                        <div className="space-y-2">
+                      <div className="text-center py-8">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                          <LinkIcon className="w-6 h-6 text-slate-400" />
+                        </div>
+                        <p className="text-muted-foreground font-medium mb-4">You haven't linked any accounts yet.</p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                           <Button
                             variant="outline"
                             onClick={async () => {
                               const res = await apiClient.getYouTubeAuthUrl();
                               window.open(res.authUrl, '_blank');
                             }}
+                            className="w-full sm:w-auto"
                           >
-                            <Youtube className="w-4 h-4 mr-2" />
+                            <Youtube className="w-4 h-4 mr-2 text-red-500" />
                             Link YouTube
                           </Button>
                           <Button
@@ -443,170 +487,177 @@ export default function WorkspacePage() {
                               const res = await apiClient.getInstagramAuthUrl();
                               window.open(res.authUrl, '_blank');
                             }}
+                            className="w-full sm:w-auto"
                           >
-                            <Instagram className="w-4 h-4 mr-2" />
+                            <Instagram className="w-4 h-4 mr-2 text-pink-500" />
                             Link Instagram
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="grid sm:grid-cols-2 gap-4">
                         {accounts.map((account) => (
                           <div
                             key={account.id}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                            className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                               selectedAccounts.includes(account.id)
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
-                                : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 shadow-sm'
+                                : 'border-slate-200 hover:border-emerald-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:border-slate-700'
                             }`}
                             onClick={() => toggleAccount(account.id)}
                           >
-                            {getPlatformIcon(account.platform)}
-                            <span className="flex-1">{account.platform_username || 'Channel'}</span>
-                            {selectedAccounts.includes(account.id) && (
-                              <CheckCircle className="w-5 h-5 text-blue-600" />
-                            )}
+                            <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm">
+                              {getPlatformIcon(account.platform)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm truncate">{account.platform_username || 'Channel'}</p>
+                              <p className="text-xs text-muted-foreground capitalize">{account.platform}</p>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-colors ${
+                              selectedAccounts.includes(account.id)
+                                ? 'bg-emerald-500 border-emerald-500 text-white'
+                                : 'border-slate-300'
+                            }`}>
+                              {selectedAccounts.includes(account.id) && <CheckCircle className="w-4 h-4" />}
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
 
-                <Card className="border-0 shadow-lg">
-                  <CardContent className="pt-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="auto-schedule">Auto-Schedule</Label>
+                    <div className="mt-8 pt-6 border-t flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="auto-schedule" className="text-base font-semibold text-slate-800 dark:text-slate-200">Auto-Schedule</Label>
+                        <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                          Automatically assign this video to the next available slot based on your Schedule Planner.
+                        </p>
+                      </div>
                       <Switch
                         id="auto-schedule"
                         checked={autoSchedule}
                         onCheckedChange={setAutoSchedule}
+                        className="data-[state=checked]:bg-emerald-500"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      When enabled, the video will be automatically assigned to the next available slot from your Schedule Planner settings.
-                    </p>
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={submitting || selectedAccounts.length === 0}
-                      className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600"
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Video
-                        </>
-                      )}
-                    </Button>
                   </CardContent>
                 </Card>
               </div>
+
             </div>
           </TabsContent>
 
           {/* Queue Tab */}
           <TabsContent value="queue">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
+            <Card className="border shadow-sm">
+              <CardHeader className="border-b bg-slate-50/50 dark:bg-slate-900/50">
                 <CardTitle>Video Queue</CardTitle>
                 <CardDescription>
                   Track all your videos in the processing pipeline
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px] pr-4">
-                  {videos.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Video className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No videos yet. Create your first one!</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {videos.map((video) => (
-                        <div
-                          key={video.id}
-                          className="p-4 rounded-xl border bg-card hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                {getStatusBadge(video.status as VideoStatus)}
-                                <span className="text-sm text-muted-foreground">
-                                  {video.auto_generated_title || 'Processing...'}
-                                </span>
-                              </div>
-                              <p className="text-sm text-muted-foreground truncate">
-                                {video.source_url}
-                              </p>
-                              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                                <span>{video.start_timestamp} - {video.end_timestamp}</span>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[600px]">
+                  <div className="p-4">
+                    {videos.length === 0 ? (
+                      <div className="text-center py-20 text-muted-foreground">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                          <Video className="w-8 h-8 opacity-50" />
+                        </div>
+                        <p className="font-medium text-lg text-slate-700 dark:text-slate-300">Queue is empty</p>
+                        <p className="text-sm mt-1">Create your first automated video to see it here.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {videos.map((video) => (
+                          <div
+                            key={video.id}
+                            className="p-5 rounded-xl border bg-card hover:shadow-md transition-all group"
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 mb-2">
+                                  {getStatusBadge(video.status as VideoStatus)}
+                                  <span className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                                    {video.auto_generated_title || 'Generating Title...'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <LinkIcon className="w-3 h-3" />
+                                  <span className="truncate max-w-[300px]">{video.source_url}</span>
+                                  <span>•</span>
+                                  <span>{video.start_timestamp} - {video.end_timestamp}</span>
+                                </div>
+                                
                                 {video.scheduled_for && (
-                                  <span className="flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
-                                    {new Date(video.scheduled_for).toLocaleString()}
-                                  </span>
+                                  <div className="flex items-center gap-2 mt-3 text-sm text-cyan-600 bg-cyan-50 dark:bg-cyan-950/30 px-3 py-1.5 rounded-md w-fit">
+                                    <Calendar className="w-4 h-4" />
+                                    <span className="font-medium">Scheduled for {new Date(video.scheduled_for).toLocaleString()}</span>
+                                  </div>
                                 )}
-                                {video.status === 'posted' && video.posted_at && (
-                                  <span className="flex items-center gap-1 text-emerald-600">
-                                    <Send className="w-3 h-3" />
-                                    Posted {new Date(video.posted_at).toLocaleDateString()}
-                                  </span>
+                                
+                                {['pending', 'downloading', 'processing', 'generating_script', 'creating_tts', 'rendering'].includes(video.status) && (
+                                  <div className="mt-4">
+                                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                                      <span>Progress</span>
+                                      <span>{video.processing_progress}%</span>
+                                    </div>
+                                    <Progress value={video.processing_progress} className="h-2 bg-slate-100 dark:bg-slate-800" />
+                                  </div>
+                                )}
+                                
+                                {video.status === 'failed' && video.error_message && (
+                                  <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 rounded-md text-sm border border-red-100 dark:border-red-900">
+                                    <strong>Error:</strong> {video.error_message}
+                                  </div>
+                                )}
+                                
+                                {video.status === 'posted' && (
+                                  <div className="mt-3 text-sm text-emerald-600 flex items-center gap-1.5">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Posted on {new Date(video.posted_at!).toLocaleDateString()}
+                                    {(video as any).metadata?.sandbox_mode && (
+                                      <Badge variant="secondary" className="ml-2 text-[10px] bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none">SANDBOX</Badge>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                              {['pending', 'downloading', 'processing', 'generating_script', 'creating_tts', 'rendering'].includes(video.status) && (
-                                <Progress value={video.processing_progress} className="mt-2 h-1" />
-                              )}
-                              {video.status === 'failed' && video.error_message && (
-                                <p className="text-xs text-red-500 mt-2">{video.error_message}</p>
-                              )}
-                              {video.status === 'posted' && (
-                                <p className="text-xs text-emerald-600 mt-2 flex items-center gap-1">
-                                  <CheckCircle className="w-3 h-3" />
-                                  Local files purged — metadata retained
-                                  {(video as any).metadata?.sandbox_mode && (
-                                    <Badge variant="secondary" className="ml-1 text-[10px]">SANDBOX</Badge>
-                                  )}
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {video.status === 'ready' && (
+                              <div className="flex flex-col sm:flex-row items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                {video.status === 'ready' && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleApprove(video.id)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+                                  >
+                                    <Calendar className="w-4 h-4 mr-1.5" />
+                                    Schedule
+                                  </Button>
+                                )}
+                                {video.status === 'failed' && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleReprocess(video.id)}
+                                    className="w-full sm:w-auto hover:bg-slate-100"
+                                  >
+                                    <RefreshCw className="w-4 h-4 mr-1.5" />
+                                    Retry
+                                  </Button>
+                                )}
                                 <Button
                                   size="sm"
-                                  onClick={() => handleApprove(video.id)}
+                                  variant="ghost"
+                                  onClick={() => handleDelete(video.id)}
+                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 w-full sm:w-auto"
                                 >
-                                  <Calendar className="w-4 h-4 mr-1" />
-                                  Approve & Schedule
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
-                              )}
-                              {video.status === 'failed' && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleReprocess(video.id)}
-                                >
-                                  <RefreshCw className="w-4 h-4 mr-1" />
-                                  Retry
-                                </Button>
-                              )}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDelete(video.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </ScrollArea>
               </CardContent>
             </Card>
@@ -615,23 +666,29 @@ export default function WorkspacePage() {
           {/* Accounts Tab */}
           <TabsContent value="accounts">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
+              <Card className="border shadow-sm">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
                   <CardTitle className="flex items-center gap-2">
                     <Youtube className="w-5 h-5 text-red-500" />
                     YouTube Channels
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-6 space-y-4">
+                  {accounts.filter(a => a.platform === 'youtube').length === 0 && (
+                    <p className="text-center text-muted-foreground py-4 text-sm">No YouTube channels linked.</p>
+                  )}
                   {accounts.filter(a => a.platform === 'youtube').map((account) => (
-                    <div key={account.id} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-slate-950 shadow-sm hover:border-red-200 transition-colors">
                       <div className="flex items-center gap-3">
-                        <Youtube className="w-5 h-5 text-red-500" />
-                        <span>{account.platform_username}</span>
+                        <div className="p-2 bg-red-50 dark:bg-red-950/30 rounded-full">
+                          <Youtube className="w-5 h-5 text-red-500" />
+                        </div>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{account.platform_username}</span>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="text-slate-400 hover:text-red-500 hover:bg-red-50"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
@@ -643,35 +700,41 @@ export default function WorkspacePage() {
                   ))}
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full mt-4 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all border-dashed"
                     onClick={async () => {
                       const res = await apiClient.getYouTubeAuthUrl();
                       window.open(res.authUrl, '_blank');
                     }}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add YouTube Channel
+                    <Plus className="w-4 h-4 mr-2 text-red-500" />
+                    Connect YouTube Channel
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
+              <Card className="border shadow-sm">
+                <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
                   <CardTitle className="flex items-center gap-2">
                     <Instagram className="w-5 h-5 text-pink-500" />
                     Instagram Accounts
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-6 space-y-4">
+                  {accounts.filter(a => a.platform === 'instagram').length === 0 && (
+                    <p className="text-center text-muted-foreground py-4 text-sm">No Instagram accounts linked.</p>
+                  )}
                   {accounts.filter(a => a.platform === 'instagram').map((account) => (
-                    <div key={account.id} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div key={account.id} className="flex items-center justify-between p-4 rounded-xl border bg-white dark:bg-slate-950 shadow-sm hover:border-pink-200 transition-colors">
                       <div className="flex items-center gap-3">
-                        <Instagram className="w-5 h-5 text-pink-500" />
-                        <span>{account.platform_username}</span>
+                        <div className="p-2 bg-pink-50 dark:bg-pink-950/30 rounded-full">
+                          <Instagram className="w-5 h-5 text-pink-500" />
+                        </div>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{account.platform_username}</span>
                       </div>
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="text-slate-400 hover:text-pink-500 hover:bg-pink-50"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
@@ -683,14 +746,14 @@ export default function WorkspacePage() {
                   ))}
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full mt-4 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition-all border-dashed"
                     onClick={async () => {
                       const res = await apiClient.getInstagramAuthUrl();
                       window.open(res.authUrl, '_blank');
                     }}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Instagram Account
+                    <Plus className="w-4 h-4 mr-2 text-pink-500" />
+                    Connect Instagram Account
                   </Button>
                 </CardContent>
               </Card>
@@ -698,6 +761,47 @@ export default function WorkspacePage() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Floating Action Bar for Create Tab */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] z-40 transform transition-transform">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Ready to automate?</span>
+            {isFormValid ? (
+              <span className="text-sm text-emerald-600 flex items-center gap-1">
+                <CheckCircle className="w-3.5 h-3.5" /> All steps completed
+              </span>
+            ) : (
+              <span className="text-sm text-red-500 flex items-center gap-1">
+                <XCircle className="w-3.5 h-3.5" /> {getDisabledReason()}
+              </span>
+            )}
+          </div>
+          
+          <Button
+            size="lg"
+            onClick={handleSubmit}
+            disabled={submitting || !isFormValid}
+            className={`w-full sm:w-auto px-8 transition-all ${
+              isFormValid 
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 shadow-lg hover:shadow-xl hover:-translate-y-0.5' 
+                : 'bg-slate-200 text-slate-400 dark:bg-slate-800 dark:text-slate-500 cursor-not-allowed'
+            }`}
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Processing Pipeline...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                Generate Automated Video
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
