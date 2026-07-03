@@ -768,12 +768,12 @@ export default function WorkspacePage() {
           <div className="flex flex-col">
             <span className="font-semibold text-slate-800 dark:text-slate-200">Ready to automate?</span>
             {isFormValid ? (
-              <span className="text-sm text-emerald-600 flex items-center gap-1">
+              <span className="text-sm text-emerald-600 flex items-center gap-1 mt-0.5">
                 <CheckCircle className="w-3.5 h-3.5" /> All steps completed
               </span>
             ) : (
-              <span className="text-sm text-red-500 flex items-center gap-1">
-                <XCircle className="w-3.5 h-3.5" /> {getDisabledReason()}
+              <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Please complete all steps above
               </span>
             )}
           </div>
