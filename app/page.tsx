@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 
-export default function VeldaraLandingPage() {
+export default function BrainrotLandingPage() {
   useEffect(() => {
     // ===================== SCROLL VIDEO =====================
     const VIDEO_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260616_212935_bbf608da-62d1-4f25-9be4-c346e4d09cc8.mp4';
@@ -241,19 +241,6 @@ export default function VeldaraLandingPage() {
       cardsAnimId = requestAnimationFrame(tickCards);
     }
 
-    // ===================== SECTION 3 INTERSECTION =====================
-    const sectionThreeInner = document.getElementById('section-three-inner');
-    let observer: IntersectionObserver;
-    if (sectionThreeInner) {
-      observer = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          sectionThreeInner.classList.add('visible');
-          if (observer) observer.unobserve(sectionThreeInner);
-        }
-      }, { threshold: 0.15 });
-      observer.observe(sectionThreeInner);
-    }
-
     return () => {
       cancelAnimationFrame(animationFrameId);
       cancelAnimationFrame(pAnimId);
@@ -265,9 +252,6 @@ export default function VeldaraLandingPage() {
         videoEl.removeEventListener('seeked', onSeeked);
         videoEl.removeEventListener('stalled', onStalled);
         videoEl.removeEventListener('loadeddata', onLoadedData);
-      }
-      if (observer && sectionThreeInner) {
-        observer.unobserve(sectionThreeInner);
       }
     };
   }, []);
@@ -285,6 +269,8 @@ export default function VeldaraLandingPage() {
         .veldara-theme .absolute { position: absolute; }
         .veldara-theme .relative { position: relative; }
         .veldara-theme .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        
+        .veldara-theme section { scroll-margin-top: 80px; }
 
         /* Scroll Video */
         #scroll-video-container {
@@ -347,13 +333,6 @@ export default function VeldaraLandingPage() {
         #hero .ctas {
           display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center;
         }
-        #hero .code-box {
-          display: flex; align-items: center; gap: 0.75rem;
-          background: rgba(16, 12, 24, 0.6); border: 1px solid rgba(168, 85, 247, 0.3);
-          border-radius: 0.5rem; padding: 0.875rem 1.5rem; backdrop-filter: blur(8px);
-        }
-        #hero .code-box .prompt { color: #06B6D4; font-family: monospace; font-size: 0.875rem; font-weight: bold; }
-        #hero .code-box code { font-size: 0.875rem; color: #e5e7eb; font-family: monospace; }
         #hero .cta-btn {
           display: inline-flex; align-items: center; gap: 0.5rem;
           background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; font-weight: 600; border-radius: 0.5rem;
@@ -371,7 +350,30 @@ export default function VeldaraLandingPage() {
           50% { transform: translateY(-25%); }
         }
 
-        /* Cards */
+        /* Features */
+        #features {
+          position: relative; z-index: 10; padding: 6rem 2.5rem; background: #06040A; display: flex; flex-direction: column; align-items: center;
+        }
+        .section-title {
+          font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 4rem; text-align: center;
+          background: linear-gradient(135deg, #fff 40%, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .feature-grid {
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 72rem; width: 100%;
+        }
+        .feature-card {
+          background: rgba(15, 10, 25, 0.6); border: 1px solid rgba(168, 85, 247, 0.2); padding: 2rem; border-radius: 0.75rem;
+          display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; transition: transform 0.2s, border-color 0.2s;
+        }
+        .feature-card:hover { transform: translateY(-4px); border-color: rgba(168, 85, 247, 0.6); }
+        .feature-icon {
+          display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 0.5rem;
+          background: rgba(168, 85, 247, 0.2); color: #A855F7;
+        }
+        .feature-card h3 { font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+        .feature-card p { color: #9ca3af; font-size: 0.9rem; line-height: 1.6; }
+
+        /* Cards (Pipeline) */
         #fixed-cards {
           position: fixed; bottom: 0; left: 0; right: 0; z-index: 4;
           padding: 3rem 2.5rem; opacity: 0; pointer-events: none;
@@ -389,24 +391,50 @@ export default function VeldaraLandingPage() {
         }
         #fixed-cards .card h3 { font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 1rem; letter-spacing: -0.01em; }
         #fixed-cards .card p { color: #9ca3af; font-size: 0.9rem; line-height: 1.6; }
+        #fixed-cards .step { font-size: 0.75rem; font-weight: 700; color: #06B6D4; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
 
-        /* Section 3 */
-        #section-three {
-          position: relative; min-height: 100vh; display: flex; align-items: flex-end;
-          justify-content: center; padding: 0 2.5rem 8rem;
+        /* Pricing */
+        #pricing {
+          position: relative; z-index: 10; padding: 6rem 2.5rem; background: #06040A; display: flex; flex-direction: column; align-items: center;
         }
-        #section-three .inner {
-          position: relative; z-index: 10; display: flex; flex-direction: column;
-          align-items: center; text-align: center;
-          opacity: 0; transform: translateY(32px); filter: blur(8px);
-          transition: opacity 1s ease-out, transform 1s ease-out, filter 1s ease-out;
+        .pricing-grid {
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 60rem; width: 100%;
         }
-        #section-three .inner.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
-        #section-three .inner p { color: #06B6D4; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
-        #section-three .inner h2 { font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 800; background: linear-gradient(135deg, #fff 40%, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .pricing-card {
+          background: rgba(15, 10, 25, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 3rem 2rem; border-radius: 1rem;
+          display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; position: relative;
+        }
+        .pricing-card.popular {
+          border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
+        }
+        .pricing-card.popular::before {
+          content: 'Most Popular'; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);
+          background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; font-size: 0.75rem; font-weight: 700;
+          padding: 0.25rem 1rem; border-radius: 1rem; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .pricing-card h3 { font-size: 1.5rem; font-weight: 700; color: #fff; }
+        .pricing-card .price { font-size: 3rem; font-weight: 800; color: #fff; display: flex; align-items: flex-start; justify-content: center; }
+        .pricing-card .price span { font-size: 1rem; font-weight: 500; color: #9ca3af; margin-top: 0.5rem; }
+        .pricing-card ul { list-style: none; display: flex; flex-direction: column; gap: 1rem; text-align: left; width: 100%; margin-top: 1rem; }
+        .pricing-card ul li { display: flex; align-items: center; gap: 0.75rem; color: #d1d5db; font-size: 0.95rem; }
+        .pricing-card ul li svg { width: 1.25rem; height: 1.25rem; color: #06B6D4; flex-shrink: 0; }
+        .pricing-btn {
+          width: 100%; padding: 1rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s;
+        }
+        .pricing-btn.primary { background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; }
+        .pricing-btn.primary:hover { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4); }
+        .pricing-btn.secondary { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .pricing-btn.secondary:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* Content wrapper */
-        #content { position: relative; z-index: 2; }
+        /* Footer */
+        footer {
+          position: relative; z-index: 10; background: #06040A; border-top: 1px solid rgba(255, 255, 255, 0.05);
+          padding: 3rem 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center;
+        }
+        footer p { color: #6b7280; font-size: 0.875rem; }
+        footer .links { display: flex; gap: 1.5rem; }
+        footer .links a { color: #9ca3af; text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+        footer .links a:hover { color: #fff; }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -415,10 +443,11 @@ export default function VeldaraLandingPage() {
           #hero .content { padding-bottom: 5rem; }
           #hero h1 { font-size: 1.75rem; }
           #hero .ctas { flex-direction: column; width: 100%; }
-          #hero .code-box, #hero .cta-btn { width: 100%; justify-content: center; }
+          #hero .cta-btn { width: 100%; justify-content: center; }
           #fixed-cards .grid { grid-template-columns: 1fr; gap: 1rem; }
           #fixed-cards { padding: 1.5rem 1rem; }
-          #section-three { padding-bottom: 5rem; }
+          #features { padding: 4rem 1.5rem; }
+          #pricing { padding: 4rem 1.5rem; }
         }
       `}} />
 
@@ -434,20 +463,23 @@ export default function VeldaraLandingPage() {
       {/* Particles */}
       <canvas id="particles-canvas"></canvas>
 
-      {/* Fixed Cards */}
+      {/* Fixed Cards for Pipeline */}
       <div id="fixed-cards">
         <div className="grid">
           <div className="card">
-            <h3>Explore Brainrot AI</h3>
-            <p>Brainrot AI merges the elegance of automation with the depth of viral algorithms within easy reach. It's crafted to be robust and adaptable while remaining intuitive and simple to grasp.</p>
+            <span className="step">Step 01</span>
+            <h3>Script & Voice</h3>
+            <p>Gemini 2.5 Flash drafts a highly engaging viral script. Edge TTS brings it to life with clear, natural human-sounding voiceovers entirely for free.</p>
           </div>
           <div className="card">
-            <h3>Unlock Growth</h3>
-            <p>The digital space is growing increasingly competitive. At its heart, Brainrot AI offers a powerful pipeline for building viral shorts and scheduling them autonomously.</p>
+            <span className="step">Step 02</span>
+            <h3>Subtitles & Render</h3>
+            <p>Local Whisper.cpp extracts word-level timestamps. FFmpeg intelligently crops your background footage and burns in eye-catching ASS subtitles.</p>
           </div>
           <div className="card">
-            <h3>Connect Everything</h3>
-            <p>Brainrot AI ships with tooling for video generation, voiceovers, scheduling, dynamic captions, and extensive utilities to make building compelling short-form content effortless.</p>
+            <span className="step">Step 03</span>
+            <h3>Schedule & Post</h3>
+            <p>Link your YouTube and Instagram accounts securely. Our local matrix scheduler automatically pushes your completed videos at optimal times (e.g., 12:30 PM & 7:30 PM).</p>
           </div>
         </div>
       </div>
@@ -457,10 +489,10 @@ export default function VeldaraLandingPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <span className="logo">brainrot.ai</span>
           <div className="nav-links">
-            <a href="#hero">Features</a>
-            <a href="#cards-trigger">Pipeline</a>
-            <a href="#section-three">Pricing</a>
-            <a href="#">Docs</a>
+            <Link href="#features">Features</Link>
+            <Link href="#pipeline">Pipeline</Link>
+            <Link href="#pricing">Pricing</Link>
+            <Link href="/how-to-use">Docs</Link>
           </div>
         </div>
         <div className="social">
@@ -485,10 +517,6 @@ export default function VeldaraLandingPage() {
               on autopilot.
             </h1>
             <div className="ctas">
-              <div className="code-box">
-                <span className="prompt">&gt;</span>
-                <code>npm run start:pipeline</code>
-              </div>
               <Link href="/workspace" className="cta-btn">Open Workspace <span>&rarr;</span></Link>
             </div>
           </div>
@@ -497,22 +525,89 @@ export default function VeldaraLandingPage() {
           </div>
         </section>
 
-        {/* Spacer */}
-        <div style={{ height: '150vh' }}></div>
+        {/* Section 2: Features */}
+        <section id="features">
+          <h2 className="section-title">Zero-Cost Tech Stack</h2>
+          <div className="feature-grid">
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+              </div>
+              <h3>AI Script Generation</h3>
+              <p>Powered by Google Gemini 2.5 Flash. Generate highly engaging, niche-specific viral scripts instantly using your 15 RPM free tier.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+              </div>
+              <h3>Free Edge TTS</h3>
+              <p>Ditch expensive voiceover APIs. We utilize Microsoft Edge TTS via Python to generate unlimited, natural-sounding voiceovers at absolutely zero cost.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>
+              </div>
+              <h3>Whisper Subtitles</h3>
+              <p>We run Whisper.cpp locally to extract highly accurate word-level timestamps, transforming plain voiceovers into dynamic, TikTok-style captioned shorts.</p>
+            </div>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" width="24" height="24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+              </div>
+              <h3>Automated Matrix</h3>
+              <p>Set it and forget it. Our cron-based scheduler renders videos and publishes them directly to your linked YouTube and Instagram accounts daily.</p>
+            </div>
+          </div>
+        </section>
 
-        {/* Cards Trigger Zone */}
+        {/* Pipeline Trigger Zone - The anchor is placed right here */}
+        <div id="pipeline" style={{ position: 'relative', top: '-100px' }}></div>
         <div id="cards-trigger" style={{ height: '200vh' }}></div>
 
         {/* Spacer */}
-        <div style={{ height: '100vh' }}></div>
+        <div style={{ height: '50vh' }}></div>
 
-        {/* Section 3 */}
-        <section id="section-three">
-          <div className="inner" id="section-three-inner">
-            <p>Presenting</p>
-            <h2>Brainrot AI</h2>
+        {/* Section 4: Pricing */}
+        <section id="pricing">
+          <h2 className="section-title">Pricing Plans</h2>
+          <div className="pricing-grid">
+            <div className="pricing-card">
+              <h3>Hobby</h3>
+              <div className="price">$0<span>/mo</span></div>
+              <ul>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> 1 Connected Account</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> 3 Videos Per Day</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Standard Render Priority</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Gemini 2.5 Flash Support</li>
+              </ul>
+              <Link href="/workspace" className="pricing-btn secondary">Get Started Free</Link>
+            </div>
+            
+            <div className="pricing-card popular">
+              <h3>Creator Pro</h3>
+              <div className="price">$15<span>/mo</span></div>
+              <ul>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Unlimited Accounts</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Unlimited Videos</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> High Priority Rendering</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> GPT-4o Script Generation</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Premium TTS Voices</li>
+              </ul>
+              <Link href="/workspace" className="pricing-btn primary">Upgrade to Pro</Link>
+            </div>
           </div>
         </section>
+
+        {/* Footer */}
+        <footer>
+          <span className="logo" style={{ fontWeight: 700, fontSize: '1.25rem', color: '#fff', letterSpacing: '-0.025em' }}>brainrot.ai</span>
+          <p>© {new Date().getFullYear()} Brainrot Video Automator. All rights reserved.</p>
+          <div className="links">
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/how-to-use">Documentation</Link>
+            <a href="https://github.com/Dark-VenomX/brainrot-automator" target="_blank" rel="noreferrer">GitHub</a>
+          </div>
+        </footer>
       </div>
     </div>
   );
