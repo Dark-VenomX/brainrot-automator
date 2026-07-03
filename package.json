@@ -10,7 +10,7 @@
     "build": "next build && tsc --project server/tsconfig.json",
     "start": "next start",
     "start:next": "next start",
-    "start:server": "node server/dist/index.js",
+    "start:server": "node dist/server/index.js",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
