@@ -1,0 +1,27 @@
+2026-07-01 16:32:15 [INFO]: Gemini AI service initialized
+2026-07-01 16:32:15 [INFO]: Express server running on port 3005
+2026-07-01 16:32:15 [INFO]: Scheduler started (dynamic per-user mode, tz=Asia/Kolkata)
+2026-07-01 16:34:02 [INFO]: Gemini AI service initialized
+2026-07-01 16:34:02 [INFO]: Express server running on port 3005
+2026-07-01 16:34:02 [INFO]: Scheduler started (dynamic per-user mode, tz=Asia/Kolkata)
+2026-07-01 16:35:00 [ERROR]: Error checking pending videos: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:35:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:36:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:36:15 [INFO]: Gemini AI service initialized
+2026-07-01 16:36:15 [INFO]: Express server running on port 3005
+2026-07-01 16:36:15 [INFO]: Scheduler started (dynamic per-user mode, tz=Asia/Kolkata)
+2026-07-01 16:37:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:38:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:39:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:40:01 [ERROR]: Error checking pending videos: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:40:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:41:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:42:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:43:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:44:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 17:23:57 [INFO]: Gemini AI service initialized
+2026-07-01 17:23:57 [INFO]: Express server running on port 3005
+2026-07-01 17:23:57 [INFO]: Scheduler started (dynamic per-user mode, tz=Asia/Kolkata)
+2026-07-03 11:31:46 [INFO]: Gemini AI service initialized
+2026-07-03 11:31:46 [INFO]: Express server running on port 3005
+2026-07-03 11:31:46 [INFO]: Scheduler started (dynamic per-user mode, tz=Asia/Kolkata)

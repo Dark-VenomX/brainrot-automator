@@ -1,0 +1,12 @@
+2026-07-01 16:35:00 [ERROR]: Error checking pending videos: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:35:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:36:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:37:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:38:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:39:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:40:01 [ERROR]: Error checking pending videos: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:40:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:41:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:42:00 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:43:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache
+2026-07-01 16:44:01 [ERROR]: Scheduler tick query failed: Could not find the table 'public.video_queue' in the schema cache

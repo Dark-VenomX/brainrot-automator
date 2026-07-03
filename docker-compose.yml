@@ -1,0 +1,108 @@
+# Brainrot Video Automator - Docker Compose Configuration
+# Note: Supabase is used for production database, local PostgreSQL is optional for development
+
+version: '3.8'
+
+services:
+  # Main Application Service
+  brainrot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: brainrot-video-automator
+    ports:
+      - "3000:3000"  # Next.js Frontend
+      - "3001:3001"  # Express Backend API
+    environment:
+      # Supabase Configuration (Production)
+      - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # Google Gemini API (Free Tier - 15 RPM limit)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+      # YouTube Data API v3
+      - YOUTUBE_CLIENT_ID=${YOUTUBE_CLIENT_ID}
+      - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET}
+      - YOUTUBE_REDIRECT_URI=${YOUTUBE_REDIRECT_URI}
+
+      # Instagram Graph API
+      - INSTAGRAM_APP_ID=${INSTAGRAM_APP_ID}
+      - INSTAGRAM_APP_SECRET=${INSTAGRAM_APP_SECRET}
+      - INSTAGRAM_REDIRECT_URI=${INSTAGRAM_REDIRECT_URI}
+
+      # Application Configuration
+      - NODE_ENV=production
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:3000
+      - API_URL=http://localhost:3001
+
+      # Paths inside container
+      - TEMP_DIR=/app/temp
+      - OUTPUT_DIR=/app/outputs
+
+      # Scheduler Times (IST)
+      - SCHEDULE_MORNING=12:30
+      - SCHEDULE_EVENING=19:30
+      - TZ=Asia/Kolkata
+    volumes:
+      # Persist output videos
+      - ./outputs:/app/outputs
+      # Persist temporary files (for debugging)
+      - ./temp:/app/temp
+      # Persist logs
+      - ./logs:/app/logs
+      # Persist whisper model cache
+      - whisper-models:/root/.cache/whisper
+    networks:
+      - brainrot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Optional: Local PostgreSQL for development (Uncomment if needed)
+  # postgres-dev:
+  #   image: postgres:15-alpine
+  #   container_name: brainrot-postgres
+  #   environment:
+  #     POSTGRES_USER: brainrot
+  #     POSTGRES_PASSWORD: brainrot_dev_password
+  #     POSTGRES_DB: brainrot_db
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - brainrot-network
+  #   restart: unless-stopped
+
+  # Optional: Redis for job queue (Future enhancement)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: brainrot-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - brainrot-network
+  #   restart: unless-stopped
+
+# Named volumes for persistence
+volumes:
+  whisper-models:
+    driver: local
+  # postgres-data:
+  #   driver: local
+  # redis-data:
+  #   driver: local
+
+# Network configuration
+networks:
+  brainrot-network:
+    driver: bridge
