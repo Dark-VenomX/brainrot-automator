@@ -60,6 +60,11 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 // OAuth Routes
 // =====================
 
+app.get('/api/oauth/test', (req: Request, res: Response) => {
+  const authUrl = oauthService.getYouTubeAuthUrl('test_state');
+  res.send(`<a href="${authUrl}">Click to test OAuth</a><br><br><pre>${authUrl}</pre>`);
+});
+
 app.get('/api/oauth/youtube', requireAuth, (req: Request, res: Response) => {
   const state = (req as any).user.id;
   const authUrl = oauthService.getYouTubeAuthUrl(state);
