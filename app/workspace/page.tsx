@@ -29,6 +29,9 @@ import {
   Link as LinkIcon,
   Clock,
   MessageSquare,
+  PlusCircle,
+  ListVideo,
+  Users,
   Youtube,
   Instagram,
   Trash2,
@@ -402,24 +405,30 @@ export default function WorkspacePage() {
             </div>
 
         <Tabs defaultValue="create" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-[400px] p-1.5 bg-slate-100/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-inner transition-colors duration-300">
-            <TabsTrigger value="create" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Create</TabsTrigger>
-            <TabsTrigger value="queue" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Queue</TabsTrigger>
-            <TabsTrigger value="accounts" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Accounts</TabsTrigger>
+          <TabsList className="flex mx-auto w-full max-w-[500px] p-2 bg-white/60 dark:bg-black/30 rounded-2xl border border-slate-200/80 dark:border-white/5 backdrop-blur-2xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all duration-500">
+            <TabsTrigger value="create" className="flex-1 flex items-center justify-center gap-2.5 rounded-xl py-2.5 font-bold text-sm tracking-wide data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-[0_2px_15px_rgb(0,0,0,0.04)] transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+              <PlusCircle className="w-[18px] h-[18px]" /> Create
+            </TabsTrigger>
+            <TabsTrigger value="queue" className="flex-1 flex items-center justify-center gap-2.5 rounded-xl py-2.5 font-bold text-sm tracking-wide data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-[0_2px_15px_rgb(0,0,0,0.04)] transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+              <ListVideo className="w-[18px] h-[18px]" /> Queue
+            </TabsTrigger>
+            <TabsTrigger value="accounts" className="flex-1 flex items-center justify-center gap-2.5 rounded-xl py-2.5 font-bold text-sm tracking-wide data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-[0_2px_15px_rgb(0,0,0,0.04)] transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+              <Users className="w-[18px] h-[18px]" /> Accounts
+            </TabsTrigger>
           </TabsList>
 
           {/* Create Tab */}
           <TabsContent value="create" className="focus-visible:outline-none focus-visible:ring-0">
-            <div className="space-y-8 pb-12">
+            <div className="space-y-12 pb-16 pt-4">
               
               {/* Step 1: Source Material */}
               <div className="relative pl-8">
-                <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">1</div>
+                <div className="absolute left-0 top-8 bottom-[-3rem] w-[2px] bg-gradient-to-b from-purple-500/50 via-slate-200 dark:via-slate-800 to-transparent"></div>
+                <div className="absolute left-[-15px] top-5 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center text-white font-bold text-sm z-10 ring-[6px] ring-slate-50 dark:ring-[#06040A]">1</div>
                 
-                <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
+                <Card className="border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.05)] transition-all duration-500 rounded-[24px]">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                    <CardTitle className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                       <LinkIcon className="w-5 h-5 text-purple-500" />
                       Source Material
                     </CardTitle>
@@ -585,12 +594,12 @@ export default function WorkspacePage() {
 
               {/* Step 2: AI Brain */}
               <div className="relative pl-8">
-                <div className="absolute left-0 top-6 bottom-[-2rem] w-0.5 bg-slate-200 dark:bg-slate-800"></div>
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">2</div>
+                <div className="absolute left-0 top-8 bottom-[-3rem] w-[2px] bg-gradient-to-b from-purple-500/50 via-slate-200 dark:via-slate-800 to-transparent"></div>
+                <div className="absolute left-[-15px] top-5 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center text-white font-bold text-sm z-10 ring-[6px] ring-slate-50 dark:ring-[#06040A]">2</div>
                 
-                <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
+                <Card className="border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.05)] transition-all duration-500 rounded-[24px]">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                    <CardTitle className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                       <Sparkles className="w-5 h-5 text-purple-500" />
                       AI Brain & Script
                     </CardTitle>
@@ -733,11 +742,11 @@ export default function WorkspacePage() {
 
               {/* Step 3: Destinations */}
               <div className="relative pl-8">
-                <div className="absolute left-[-11px] top-5 w-6 h-6 rounded-full bg-purple-500/20 border-2 border-purple-500 flex items-center justify-center text-purple-400 font-bold text-xs z-10">3</div>
+                <div className="absolute left-[-15px] top-5 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_15px_rgba(168,85,247,0.4)] flex items-center justify-center text-white font-bold text-sm z-10 ring-[6px] ring-slate-50 dark:ring-[#06040A]">3</div>
                 
                 <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-                  <CardHeader className="bg-black/20 border-b border-white/5">
-                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <CardHeader className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                    <CardTitle className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                       <Send className="w-5 h-5 text-emerald-500" />
                       Destinations <span className="text-red-500">*</span>
                     </CardTitle>
@@ -831,9 +840,9 @@ export default function WorkspacePage() {
 
           {/* Queue Tab */}
           <TabsContent value="queue">
-            <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
-              <CardHeader className="border-b border-white/5 bg-black/20">
-                <CardTitle className="text-white">Video Queue</CardTitle>
+            <Card className="border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.05)] transition-all duration-500 rounded-[24px] overflow-hidden">
+              <CardHeader className="border-b border-slate-200/50 dark:border-white/5 bg-slate-50/50 dark:bg-white/5">
+                <CardTitle className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Video Queue</CardTitle>
                 <CardDescription>
                   Track all your videos in the processing pipeline
                 </CardDescription>
@@ -973,9 +982,9 @@ export default function WorkspacePage() {
           {/* Accounts Tab */}
           <TabsContent value="accounts">
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
-                <CardHeader className="bg-black/20 border-b border-white/5">
-                  <CardTitle className="flex items-center gap-2 text-white">
+              <Card className="border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.05)] transition-all duration-500 rounded-[24px] overflow-hidden">
+                <CardHeader className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                  <CardTitle className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     <Youtube className="w-5 h-5 text-red-500" />
                     YouTube Channels
                   </CardTitle>
@@ -1019,9 +1028,9 @@ export default function WorkspacePage() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-white/10 bg-[#0F0A19]/60 backdrop-blur-sm shadow-sm">
-                <CardHeader className="bg-black/20 border-b border-white/5">
-                  <CardTitle className="flex items-center gap-2 text-white">
+              <Card className="border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.05)] transition-all duration-500 rounded-[24px] overflow-hidden">
+                <CardHeader className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                  <CardTitle className="flex items-center gap-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     <Instagram className="w-5 h-5 text-pink-500" />
                     Instagram Accounts
                   </CardTitle>

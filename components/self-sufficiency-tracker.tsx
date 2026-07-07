@@ -57,7 +57,7 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
   // Visual config based on state
   const config = isCritical
     ? {
-        cardClass: 'border-red-500/20 bg-gradient-to-br from-white to-red-50/50 dark:from-black dark:to-red-950/20 backdrop-blur-xl',
+        cardClass: 'border-red-500/30 dark:border-red-500/20 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl',
         iconBg: 'bg-red-500/10 dark:bg-red-500/20',
         iconColor: 'text-red-500 dark:text-red-400',
         icon: <BatteryLow className="w-6 h-6" />,
@@ -69,7 +69,7 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
       }
     : isWarning
       ? {
-          cardClass: 'border-amber-500/20 bg-gradient-to-br from-white to-amber-50/50 dark:from-black dark:to-amber-950/20 backdrop-blur-xl',
+          cardClass: 'border-amber-500/30 dark:border-amber-500/20 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl',
           iconBg: 'bg-amber-500/10 dark:bg-amber-500/20',
           iconColor: 'text-amber-500 dark:text-amber-400',
           icon: <BatteryMedium className="w-6 h-6" />,
@@ -80,7 +80,7 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
           valueColor: 'text-amber-600 dark:text-amber-400',
         }
       : {
-          cardClass: 'border-emerald-500/20 bg-gradient-to-br from-white to-emerald-50/50 dark:from-black dark:to-emerald-950/20 backdrop-blur-xl',
+          cardClass: 'border-emerald-500/30 dark:border-emerald-500/20 bg-white/80 dark:bg-[#0A0A14]/80 backdrop-blur-2xl',
           iconBg: 'bg-emerald-500/10 dark:bg-emerald-500/20',
           iconColor: 'text-emerald-500 dark:text-emerald-400',
           icon: <BatteryFull className="w-6 h-6" />,
@@ -96,7 +96,7 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
   const progressPct = Math.min((days / targetDays) * 100, 100);
 
   return (
-    <Card className={`border shadow-lg transition-all duration-500 ${config.cardClass} ${config.ringClass}`}>
+    <Card className={`border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] transition-all duration-500 rounded-[24px] ${config.cardClass} ${config.ringClass}`}>
       <CardHeader className="pb-3 border-b border-slate-200/50 dark:border-white/5">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
