@@ -714,6 +714,14 @@ export default function WorkspacePage() {
                                 )}
                                 
                                 {video.status === 'posted' && (
+                                  <div className="mt-3 text-sm text-emerald-400 flex items-center gap-1.5">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Posted on {new Date(video.posted_at!).toLocaleDateString()}
+                                    {(video as any).metadata?.sandbox_mode && (
+                                      <Badge variant="secondary" className="ml-2 text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">SANDBOX</Badge>
+                                    )}
+                                  </div>
+                                )}
 
                                 {video.status === 'ready' && (video as any).metadata?.viral_strategy && (
                                   <div className="mt-4 p-4 bg-[#0F0A19] border border-white/10 rounded-xl">
@@ -736,15 +744,6 @@ export default function WorkspacePage() {
                                         <span className="text-emerald-400 font-medium">{(video as any).metadata.viral_strategy.optimal_timing}</span>
                                       </div>
                                     </div>
-                                  </div>
-                                )}
-
-                                  <div className="mt-3 text-sm text-emerald-400 flex items-center gap-1.5">
-                                    <CheckCircle className="w-4 h-4" />
-                                    Posted on {new Date(video.posted_at!).toLocaleDateString()}
-                                    {(video as any).metadata?.sandbox_mode && (
-                                      <Badge variant="secondary" className="ml-2 text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">SANDBOX</Badge>
-                                    )}
                                   </div>
                                 )}
                               </div>

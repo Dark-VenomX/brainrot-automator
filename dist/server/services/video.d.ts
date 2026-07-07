@@ -16,10 +16,10 @@ export declare class VideoService {
         duration: number;
         fps: number;
     }>;
-    needsSmartCrop(width: number, height: number): boolean;
-    generateASSSubtitle(words: WhisperWord[], outputPath?: string): string;
-    writeASSSubtitle(words: WhisperWord[], outputPath?: string): Promise<string>;
-    renderFinalVideo(videoPath: string, audioPath: string, subtitlePath: string, outputPath?: string, backgroundVolume?: number, voiceVolume?: number): Promise<string>;
+    needsSmartCrop(width: number, height: number, targetRatio?: string): boolean;
+    generateASSSubtitle(words: WhisperWord[], outputPath?: string, fontStyle?: string): string;
+    writeASSSubtitle(words: WhisperWord[], outputPath?: string, fontStyle?: string): Promise<string>;
+    renderFinalVideo(videoPath: string, audioPath: string, subtitlePath: string, outputPath?: string, backgroundVolume?: number, voiceVolume?: number, bgMusic?: string, aspectRatio?: string): Promise<string>;
     getAudioDuration(audioPath: string): Promise<number>;
     cleanupFiles(filePaths: string[]): Promise<void>;
 }

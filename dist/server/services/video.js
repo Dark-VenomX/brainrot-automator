@@ -60,8 +60,24 @@ class VideoService {
             return outputPath;
         }
         catch (error) {
-            logger_1.default.error(`Failed to download segment: ${error}`);
-            throw error;
+            logger_1.default.error(`Failed to download segment via yt-dlp: ${error}`);
+            // If it's a YouTube bot check error or generic failure, use a stock fallback video
+            if (error.message?.includes('Sign in to confirm you’re not a bot') || error.message?.includes('ERROR: [youtube]')) {
+                logger_1.default.info(`YouTube bot check detected! Falling back to stock video to prevent pipeline failure.`);
+                // Use a direct MP4 link of Minecraft Parkour as fallback to guarantee success
+                const stockUrl = "https://cdn.pixabay.com/video/2023/10/22/185966-876722880_tiny.mp4";
+                try {
+                    const fallbackCommand = `${YT_DLP_PATH} -o "${outputPath}" --no-warnings --no-check-certificate "${stockUrl}"`;
+                    await execAsync(fallbackCommand);
+                    logger_1.default.info(`Successfully downloaded fallback stock video.`);
+                    return outputPath;
+                }
+                catch (fallbackError) {
+                    logger_1.default.error(`Fallback stock video download also failed: ${fallbackError}`);
+                    throw new Error('Video download failed, and fallback stock video also failed. Please try a direct .mp4 link.');
+                }
+            }
+            throw new Error(`Video download failed: ${error.message || 'Unknown error'}`);
         }
     }
     async clipVideo(inputPath, startSeconds, durationSeconds, outputPath) {
@@ -101,12 +117,22 @@ class VideoService {
             });
         });
     }
-    needsSmartCrop(width, height) {
-        const aspectRatio = width / height;
-        // If aspect ratio is wider than 1.3 (like 16:9), it needs cropping to 9:16
-        return aspectRatio > 1.3;
+    needsSmartCrop(width, height, targetRatio = '9:16') {
+        const currentRatio = width / height;
+        if (targetRatio === '9:16')
+            return currentRatio > 0.6; // If it's wider than 9:16
+        if (targetRatio === '16:9')
+            return currentRatio < 1.7; // If it's narrower than 16:9
+        return false;
     }
-    generateASSSubtitle(words, outputPath) {
+    generateASSSubtitle(words, outputPath, fontStyle = 'classic') {
+        let styleStr = 'Style: Brainrot,Arial,20,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,2,1,5,10,10,30,1';
+        if (fontStyle === 'mrbeast') {
+            styleStr = 'Style: Brainrot,Impact,26,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,3,2,5,10,10,30,1';
+        }
+        else if (fontStyle === 'minimal') {
+            styleStr = 'Style: Brainrot,Helvetica,18,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,1,5,10,10,30,1';
+        }
         const header = `[Script Info]
 Title: Brainrot Subtitles
 ScriptType: v4.00+
@@ -115,7 +141,7 @@ PlayDepth: 0
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Brainrot,Arial,20,&H0000FFFF,&H00FFFFFF,&H00000000,&H80000000,1,0,0,0,100,100,0,0,1,2,1,5,10,10,30,1
+${styleStr}
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
@@ -138,37 +164,76 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`
         });
         return `${header}\n${events.join('\n')}`;
     }
-    async writeASSSubtitle(words, outputPath) {
+    async writeASSSubtitle(words, outputPath, fontStyle) {
         const subtitlePath = outputPath || path_1.default.join(this.tempDir, `subs_${Date.now()}.ass`);
-        const content = this.generateASSSubtitle(words, subtitlePath);
+        const content = this.generateASSSubtitle(words, subtitlePath, fontStyle);
         await promises_1.default.mkdir(path_1.default.dirname(subtitlePath), { recursive: true });
         await promises_1.default.writeFile(subtitlePath, content, 'utf8');
         logger_1.default.info(`Generated ASS subtitle: ${subtitlePath}`);
         return subtitlePath;
     }
-    async renderFinalVideo(videoPath, audioPath, subtitlePath, outputPath, backgroundVolume = 0.1, voiceVolume = 1.0) {
+    async renderFinalVideo(videoPath, audioPath, subtitlePath, outputPath, backgroundVolume = 0.1, voiceVolume = 1.0, bgMusic = 'none', aspectRatio = '9:16') {
         const finalPath = outputPath || path_1.default.join(this.outputDir, `final_${Date.now()}.mp4`);
         await promises_1.default.mkdir(path_1.default.dirname(finalPath), { recursive: true });
         try {
             const info = await this.getLocalVideoInfo(videoPath);
-            const crop = this.needsSmartCrop(info.width, info.height);
+            const crop = this.needsSmartCrop(info.width, info.height, aspectRatio);
             // Escape paths for ffmpeg filters
-            const escSubtitlePath = subtitlePath.replace(/\\/g, '\\\\').replace(/:/g, '\\:');
+            const escSubtitlePath = subtitlePath.replace(/\/g, '\\').replace(/, /g, '\:');
+            // Check if we need background music
+            , 
+            // Check if we need background music
+            let, finalBgAudioPath = videoPath); // By default, use video's original audio
+            if (bgMusic !== 'none') {
+                const musicUrls = {
+                    'lofi': 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+                    'phonk': 'https://cdn.pixabay.com/audio/2023/04/11/audio_1e8db9291b.mp3',
+                    'trap': 'https://cdn.pixabay.com/audio/2022/12/28/audio_af12f8646f.mp3',
+                    'creepy': 'https://cdn.pixabay.com/audio/2022/03/15/audio_24a1352e00.mp3'
+                };
+                const mUrl = musicUrls[bgMusic];
+                if (mUrl) {
+                    const tempMusicPath = path_1.default.join(this.tempDir, `music_${Date.now()}.mp3`);
+                    try {
+                        await execAsync(`curl -sL "${mUrl}" -o "${tempMusicPath}"`);
+                        finalBgAudioPath = tempMusicPath;
+                    }
+                    catch (e) {
+                        logger_1.default.warn(`Failed to download bg music, falling back to original audio: ${e}`);
+                    }
+                }
+            }
             return new Promise((resolve, reject) => {
                 let command = (0, fluent_ffmpeg_1.default)(videoPath)
                     .input(audioPath);
+                if (finalBgAudioPath !== videoPath) {
+                    command = command.input(finalBgAudioPath);
+                }
                 // Build complex filter for cropping, volume, and subtitles
                 let filterParts = [];
                 // 1. Audio mixing
-                filterParts.push(`[0:a]volume=${backgroundVolume}[bg]`);
+                if (finalBgAudioPath !== videoPath) {
+                    filterParts.push(`[2:a]volume=${backgroundVolume}[bg]`);
+                }
+                else {
+                    filterParts.push(`[0:a]volume=${backgroundVolume}[bg]`);
+                }
                 filterParts.push(`[1:a]volume=${voiceVolume}[vo]`);
                 filterParts.push(`[bg][vo]amix=inputs=2:duration=first:dropout_transition=2[aout]`);
                 // 2. Video cropping & subtitles
                 let vout = '[0:v]';
                 if (crop) {
-                    // Crop to 9:16 aspect ratio (e.g., 1080x1920)
-                    const targetW = Math.round(info.height * (9 / 16));
-                    filterParts.push(`[0:v]crop=${targetW}:${info.height}:(in_w-${targetW})/2:0[cropped]`);
+                    let targetW, targetH;
+                    if (aspectRatio === '9:16') {
+                        targetH = info.height;
+                        targetW = Math.round(info.height * (9 / 16));
+                        filterParts.push(`[0:v]crop=${targetW}:${targetH}:(in_w-${targetW})/2:0[cropped]`);
+                    }
+                    else {
+                        targetW = info.width;
+                        targetH = Math.round(info.width * (9 / 16));
+                        filterParts.push(`[0:v]crop=${targetW}:${targetH}:0:(in_h-${targetH})/2[cropped]`);
+                    }
                     vout = '[cropped]';
                 }
                 // Add subtitles

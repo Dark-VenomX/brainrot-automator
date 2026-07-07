@@ -60,6 +60,11 @@ export interface GeminiResponse {
     script: string;
     title: string;
     hashtags: string[];
+    viral_strategy?: {
+        captions: string[];
+        hashtags: string[];
+        optimal_timing: string;
+    };
 }
 export interface VideoProcessingOptions {
     videoId: string;
@@ -71,6 +76,10 @@ export interface VideoProcessingOptions {
     voiceName?: string;
     language?: string;
     targetAccounts?: string[];
+    aspectRatio?: '16:9' | '9:16';
+    niche?: string;
+    bgMusic?: string;
+    fontStyle?: string;
 }
 export interface AuthTokens {
     access_token: string;

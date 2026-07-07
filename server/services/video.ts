@@ -216,7 +216,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`
       const crop = this.needsSmartCrop(info.width, info.height, aspectRatio);
       
       // Escape paths for ffmpeg filters
-      const escSubtitlePath = subtitlePath.replace(/\/g, '\\').replace(/:/g, '\:');
+      const escSubtitlePath = subtitlePath.replace(/\\\\/g, '\\\\\\\\').replace(/:/g, '\\\\:');
 
       // Check if we need background music
       let finalBgAudioPath = videoPath; // By default, use video's original audio

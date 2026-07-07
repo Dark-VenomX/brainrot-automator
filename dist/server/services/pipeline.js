@@ -78,11 +78,15 @@ class VideoPipeline {
             let script = video.generated_script;
             let title = video.auto_generated_title;
             let hashtags = video.auto_generated_hashtags;
+            let metadataObj = video.metadata || {};
             if (!script || video.topic_input) {
-                const geminiResponse = await ai_1.aiService.generateScript(video.topic_input || 'interesting topic', `Source video: ${video.source_url}`);
+                const geminiResponse = await ai_1.aiService.generateScript(video.topic_input || 'interesting topic', `Source video: ${video.source_url}`, metadataObj.niche, metadataObj.aspect_ratio);
                 script = geminiResponse.script;
                 title = geminiResponse.title;
                 hashtags = geminiResponse.hashtags;
+                if (geminiResponse.viral_strategy) {
+                    metadataObj.viral_strategy = geminiResponse.viral_strategy;
+                }
             }
             if (!title || hashtags.length === 0) {
                 const metadata = await ai_1.aiService.generateMetadata(script || '', video.topic_input || undefined);
@@ -97,6 +101,7 @@ class VideoPipeline {
                 generated_script: script,
                 auto_generated_title: title,
                 auto_generated_hashtags: hashtags,
+                metadata: metadataObj,
             })
                 .eq('id', videoId);
             await this.completeJob(scriptJob.id);
@@ -121,7 +126,8 @@ class VideoPipeline {
                 logger_1.default.warn(`Whisper failed, using fallback timing: ${whisperError}`);
                 wordTimestamps = await ai_1.whisperService.fallbackWordTimestamps(script, ttsDuration);
             }
-            const assPath = await video_1.videoService.writeASSSubtitle(wordTimestamps, path_1.default.join(this.tempDir, `${tempPrefix}_subs.ass`));
+            const fontStyle = video.metadata?.font_style || 'classic';
+            const assPath = await video_1.videoService.writeASSSubtitle(wordTimestamps, path_1.default.join(this.tempDir, `${tempPrefix}_subs.ass`), fontStyle);
             cleanupFiles.push(assPath);
             await supabase_1.supabaseAdmin
                 .from(supabase_1.TABLES.VIDEO_QUEUE)
@@ -131,7 +137,9 @@ class VideoPipeline {
             await this.updateProgress(videoId, 'rendering', 60);
             const renderJob = await this.createJob(videoId, 'render');
             const outputPath = path_1.default.join(this.outputDir, `${videoId}.mp4`);
-            await video_1.videoService.renderFinalVideo(downloadedFile, ttsPath, assPath, outputPath, 0.1, 1.0);
+            const bgMusic = video.metadata?.bg_music || 'none';
+            const aspectRatio = video.metadata?.aspect_ratio || '9:16';
+            await video_1.videoService.renderFinalVideo(downloadedFile, ttsPath, assPath, outputPath, 0.1, 1.0, bgMusic, aspectRatio);
             await supabase_1.supabaseAdmin
                 .from(supabase_1.TABLES.VIDEO_QUEUE)
                 .update({

@@ -231,7 +231,7 @@ app.get('/api/dev/test-render/status', requireAuth, async (_req, res) => {
 // =====================
 app.post('/api/videos', requireAuth, async (req, res) => {
     try {
-        const { source_url, start_timestamp = '00:00', end_timestamp = '00:45', topic_input, generated_script, voice_name = 'en-US-AriaNeural', target_account_ids = [], auto_schedule = false, } = req.body;
+        const { source_url, start_timestamp = '00:00', end_timestamp = '00:45', topic_input, generated_script, voice_name = 'en-US-AriaNeural', target_account_ids = [], auto_schedule = false, aspect_ratio = '9:16', niche, bg_music, font_style = 'classic', } = req.body;
         if (!source_url) {
             return res.status(400).json({ error: 'source_url is required' });
         }
@@ -247,6 +247,12 @@ app.post('/api/videos', requireAuth, async (req, res) => {
             voice_name,
             target_account_ids,
             status: 'pending',
+            metadata: {
+                aspect_ratio,
+                niche,
+                bg_music,
+                font_style,
+            },
         })
             .select()
             .single();

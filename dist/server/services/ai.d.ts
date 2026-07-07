@@ -7,7 +7,7 @@ export declare class AIService {
     constructor(apiKey?: string);
     private init;
     setApiKey(apiKey: string): void;
-    generateScript(topic: string, videoContext?: string): Promise<GeminiResponse>;
+    generateScript(topic: string, videoContext?: string, niche?: string, aspectRatio?: string): Promise<GeminiResponse>;
     generateMetadata(script: string, topic?: string): Promise<{
         title: string;
         hashtags: string[];
