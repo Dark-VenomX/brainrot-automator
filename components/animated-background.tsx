@@ -259,7 +259,7 @@ export function AnimatedBackground() {
         <div 
           className="absolute inset-0 transition-all duration-1000"
           style={{ 
-            filter: isDark ? 'none' : 'grayscale(1) invert(1) contrast(1.2) brightness(1.05)' 
+            filter: isDark ? 'none' : 'invert(1) hue-rotate(180deg) contrast(1.2) brightness(1.05)' 
           }}
         >
           <canvas id="video-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></canvas>
@@ -267,7 +267,7 @@ export function AnimatedBackground() {
         </div>
         
         {/* Dynamic overlay based on theme */}
-        <div className={`absolute inset-0 transition-all duration-1000 ${isDark ? 'bg-[#06040A]/60' : 'bg-white/20'}`}></div>
+        <div className={`absolute inset-0 transition-all duration-1000 ${isDark ? 'bg-[#06040A]/60' : 'bg-white/10'}`}></div>
       </div>
       <canvas id="particles-canvas" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}></canvas>
     </>
