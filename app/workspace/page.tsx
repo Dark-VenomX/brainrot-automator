@@ -396,7 +396,7 @@ export default function WorkspacePage() {
         {loading && accounts.length === 0 && videos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="w-10 h-10 flex items-center justify-center mb-2"><div className="loader scale-[0.5]"></div></div>
-            <p className="text-gray-400 font-medium animate-pulse">Loading Workspace...</p>
+            <p className="text-slate-500 dark:text-gray-400 font-medium animate-pulse">Loading Workspace...</p>
           </div>
         ) : (
           <>
@@ -438,14 +438,14 @@ export default function WorkspacePage() {
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label className="font-semibold text-gray-300">Aspect Ratio</Label>
+                      <Label className="font-semibold text-slate-700 dark:text-gray-300">Aspect Ratio</Label>
                       <div className="flex gap-4">
-                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '9:16' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
+                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '9:16' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-slate-500 dark:text-gray-400 hover:border-white/30'}`}>
                           <input type="radio" name="aspectRatio" value="9:16" className="hidden" checked={aspectRatio === '9:16'} onChange={() => setAspectRatio('9:16')} />
                           <div className="w-3 h-5 border-2 border-current rounded-sm"></div>
                           <span className="font-medium">Vertical (9:16)</span>
                         </label>
-                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '16:9' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
+                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '16:9' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-slate-500 dark:text-gray-400 hover:border-white/30'}`}>
                           <input type="radio" name="aspectRatio" value="16:9" className="hidden" checked={aspectRatio === '16:9'} onChange={() => setAspectRatio('16:9')} />
                           <div className="w-5 h-3 border-2 border-current rounded-sm"></div>
                           <span className="font-medium">Horizontal (16:9)</span>
@@ -453,17 +453,17 @@ export default function WorkspacePage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="source-url" className="font-semibold text-gray-300">Video Source (YouTube URL or Local Upload) <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="source-url" className="font-semibold text-slate-700 dark:text-gray-300">Video Source (YouTube URL or Local Upload) <span className="text-red-500">*</span></Label>
                       <div className="flex gap-2 items-center">
                         <Input
                           id="source-url"
                           placeholder="https://www.youtube.com/watch?v=..."
                           value={sourceUrl}
                           onChange={(e) => setSourceUrl(e.target.value)}
-                          className="bg-black/40 border-white/10 focus-visible:ring-purple-500 text-white flex-1"
+                          className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:focus-visible:ring-purple-500 flex-1"
                           disabled={isUploadingFile}
                         />
-                        <span className="text-sm text-gray-400">or</span>
+                        <span className="text-sm text-slate-500 dark:text-gray-400">or</span>
                         <div className="relative">
                           <input 
                             type="file" 
@@ -479,7 +479,7 @@ export default function WorkspacePage() {
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <Label className="font-semibold text-gray-300 cursor-pointer" onClick={() => setIsBatchMode(!isBatchMode)}>
+                      <Label className="font-semibold text-slate-700 dark:text-gray-300 cursor-pointer" onClick={() => setIsBatchMode(!isBatchMode)}>
                         Batch Mode (Extract Multiple Clips)
                       </Label>
                       <Switch checked={isBatchMode} onCheckedChange={setIsBatchMode} />
@@ -488,23 +488,23 @@ export default function WorkspacePage() {
                     {!isBatchMode ? (
                       <div className="grid grid-cols-2 gap-6 mt-4">
                         <div className="space-y-2">
-                          <Label htmlFor="start-time" className="font-semibold text-gray-300">Start Time</Label>
+                          <Label htmlFor="start-time" className="font-semibold text-slate-700 dark:text-gray-300">Start Time</Label>
                           <Input
                             id="start-time"
                             placeholder="00:00"
                             value={startTimestamp}
                             onChange={(e) => setStartTimestamp(e.target.value)}
-                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
+                            className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono focus-visible:ring-purple-500"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="end-time" className="font-semibold text-gray-300">End Time</Label>
+                          <Label htmlFor="end-time" className="font-semibold text-slate-700 dark:text-gray-300">End Time</Label>
                           <Input
                             id="end-time"
                             placeholder="00:45"
                             value={endTimestamp}
                             onChange={(e) => setEndTimestamp(e.target.value)}
-                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
+                            className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-mono focus-visible:ring-purple-500"
                           />
                         </div>
                       </div>
@@ -512,7 +512,7 @@ export default function WorkspacePage() {
                       <div className="mt-4 p-5 border border-purple-500/30 bg-purple-500/5 dark:bg-purple-900/10 rounded-2xl space-y-4">
                         <div className="flex items-center justify-between mb-2">
                           <div>
-                            <Label htmlFor="batch-start" className="font-semibold text-slate-900 dark:text-gray-300 block mb-1">Start Chopping From</Label>
+                            <Label htmlFor="batch-start" className="font-semibold text-slate-900 dark:text-slate-700 dark:text-gray-300 block mb-1">Start Chopping From</Label>
                             <Input
                               id="batch-start"
                               placeholder="00:00"
@@ -530,7 +530,7 @@ export default function WorkspacePage() {
                         </div>
                         
                         <div className="space-y-3">
-                          <Label className="font-semibold text-slate-900 dark:text-gray-300 block">Clip Extraction Rules</Label>
+                          <Label className="font-semibold text-slate-900 dark:text-slate-700 dark:text-gray-300 block">Clip Extraction Rules</Label>
                           {batchRules.map((rule, index) => (
                             <div key={rule.id} className="flex gap-3 items-end p-3 bg-white/50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/5">
                               <div className="flex-1 space-y-1">
@@ -609,13 +609,13 @@ export default function WorkspacePage() {
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="topic" className="font-semibold text-gray-300">Topic Idea <span className="text-xs font-normal text-gray-500 ml-2">(Optional - AI will generate a script)</span></Label>
+                      <Label htmlFor="topic" className="font-semibold text-slate-700 dark:text-gray-300">Topic Idea <span className="text-xs font-normal text-gray-500 ml-2">(Optional - AI will generate a script)</span></Label>
                       <Input
                         id="topic"
                         placeholder="e.g., Amazing space facts, The history of Rome..."
                         value={topicInput}
                         onChange={(e) => setTopicInput(e.target.value)}
-                        className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
+                        className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus-visible:ring-purple-500"
                       />
                     </div>
                     
@@ -629,22 +629,22 @@ export default function WorkspacePage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="script" className="font-semibold text-gray-300">Custom Script <span className="text-xs font-normal text-gray-500 ml-2">(Overrides topic)</span></Label>
+                      <Label htmlFor="script" className="font-semibold text-slate-700 dark:text-gray-300">Custom Script <span className="text-xs font-normal text-gray-500 ml-2">(Overrides topic)</span></Label>
                       <Textarea
                         id="script"
                         placeholder="Write your exact script here..."
                         rows={4}
                         value={scriptInput}
                         onChange={(e) => setScriptInput(e.target.value)}
-                        className="bg-black/40 border-white/10 resize-none text-white focus-visible:ring-purple-500"
+                        className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white resize-none focus-visible:ring-purple-500"
                       />
                     </div>
 
                     <div className="space-y-2 pt-2">
-                      <Label htmlFor="voice" className="font-semibold text-gray-300">AI Voice Model</Label>
+                      <Label htmlFor="voice" className="font-semibold text-slate-700 dark:text-gray-300">AI Voice Model</Label>
                       <select
                         id="voice"
-                        className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                        className="w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
                         value={voiceName}
                         onChange={(e) => setVoiceName(e.target.value)}
                       >
@@ -655,10 +655,10 @@ export default function WorkspacePage() {
                       </select>
                     </div>
                     <div className="space-y-2 pt-2 border-t border-white/10 mt-4">
-                      <Label htmlFor="niche" className="font-semibold text-gray-300">Content Niche</Label>
+                      <Label htmlFor="niche" className="font-semibold text-slate-700 dark:text-gray-300">Content Niche</Label>
                       <select
                         id="niche"
-                        className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                        className="w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
                         value={niche}
                         onChange={(e) => setNiche(e.target.value)}
                       >
@@ -680,18 +680,18 @@ export default function WorkspacePage() {
                           placeholder="Type your custom niche..." 
                           value={customNiche} 
                           onChange={(e) => setCustomNiche(e.target.value)}
-                          className="mt-2 bg-black/40 border-white/10 text-white"
+                          className="mt-2 bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-white"
                         />
                       )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="bg-music" className="font-semibold text-gray-300">Background Music</Label>
+                        <Label htmlFor="bg-music" className="font-semibold text-slate-700 dark:text-gray-300">Background Music</Label>
                         <div className="flex gap-2">
                           <select
                             id="bg-music"
-                            className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm flex-1"
+                            className="w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm flex-1"
                             value={bgMusic.startsWith('file://') ? 'custom' : bgMusic}
                             onChange={(e) => {
                               if (e.target.value !== 'custom') {
@@ -722,10 +722,10 @@ export default function WorkspacePage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="font-style" className="font-semibold text-gray-300">Subtitle Font</Label>
+                        <Label htmlFor="font-style" className="font-semibold text-slate-700 dark:text-gray-300">Subtitle Font</Label>
                         <select
                           id="font-style"
-                          className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                          className="w-full px-3 py-2.5 border rounded-lg bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
                           value={fontStyle}
                           onChange={(e) => setFontStyle(e.target.value)}
                         >
@@ -820,7 +820,7 @@ export default function WorkspacePage() {
                     <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
                       <div>
                         <Label htmlFor="auto-schedule" className="text-base font-semibold text-white">Auto-Schedule</Label>
-                        <p className="text-sm text-gray-400 mt-1 max-w-md">
+                        <p className="text-sm text-slate-500 dark:text-gray-400 mt-1 max-w-md">
                           Automatically assign this video to the next available slot based on your Schedule Planner.
                         </p>
                       </div>
@@ -855,7 +855,7 @@ export default function WorkspacePage() {
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-black/40 mb-4">
                           <Video className="w-8 h-8 opacity-50" />
                         </div>
-                        <p className="font-medium text-lg text-gray-300">Queue is empty</p>
+                        <p className="font-medium text-lg text-slate-700 dark:text-gray-300">Queue is empty</p>
                         <p className="text-sm mt-1">Create your first automated video to see it here.</p>
                       </div>
                     ) : (
@@ -921,16 +921,16 @@ export default function WorkspacePage() {
                                     </div>
                                     <div className="space-y-3 text-sm">
                                       <div>
-                                        <span className="text-gray-400">Caption: </span>
-                                        <span className="text-gray-200">{(video as any).metadata.viral_strategy.captions?.[0]}</span>
+                                        <span className="text-slate-500 dark:text-gray-400">Caption: </span>
+                                        <span className="text-slate-800 dark:text-gray-200">{(video as any).metadata.viral_strategy.captions?.[0]}</span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-400">Hashtags: </span>
+                                        <span className="text-slate-500 dark:text-gray-400">Hashtags: </span>
                                         <span className="text-blue-400">{(video as any).metadata.viral_strategy.hashtags?.join(' ')}</span>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <Clock className="w-3.5 h-3.5 text-gray-400" />
-                                        <span className="text-gray-400">Best time to post: </span>
+                                        <Clock className="w-3.5 h-3.5 text-slate-500 dark:text-gray-400" />
+                                        <span className="text-slate-500 dark:text-gray-400">Best time to post: </span>
                                         <span className="text-emerald-400 font-medium">{(video as any).metadata.viral_strategy.optimal_timing}</span>
                                       </div>
                                     </div>
@@ -1004,7 +1004,7 @@ export default function WorkspacePage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                        className="text-slate-500 dark:text-gray-400 hover:text-red-400 hover:bg-red-500/10"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
@@ -1050,7 +1050,7 @@ export default function WorkspacePage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-gray-400 hover:text-pink-400 hover:bg-pink-500/10"
+                        className="text-slate-500 dark:text-gray-400 hover:text-pink-400 hover:bg-pink-500/10"
                         onClick={async () => {
                           await apiClient.unlinkAccount(account.id);
                           loadData();
