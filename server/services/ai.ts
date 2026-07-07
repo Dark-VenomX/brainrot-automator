@@ -47,8 +47,8 @@ export class AIService {
     if (this.initialized) return;
     this.genAI = new GoogleGenerativeAI(this.apiKey);
     this.models = [
-      this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }),
       this.genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }),
+      this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }),
       this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
     ];
     this.initialized = true;
