@@ -256,11 +256,18 @@ export function AnimatedBackground() {
   return (
     <>
       <div id="scroll-video-container" className="fixed inset-0 z-0 top-[-20%] transition-colors duration-500" style={{ background: isDark ? '#06040A' : '#f8fafc' }}>
-        <canvas id="video-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></canvas>
-        <video id="video-fallback" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260616_212935_bbf608da-62d1-4f25-9be4-c346e4d09cc8.mp4" muted playsInline crossOrigin="anonymous" preload="auto" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></video>
+        <div 
+          className="absolute inset-0 transition-all duration-1000"
+          style={{ 
+            filter: isDark ? 'none' : 'grayscale(1) invert(1) contrast(1.1) brightness(1.1)' 
+          }}
+        >
+          <canvas id="video-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></canvas>
+          <video id="video-fallback" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260616_212935_bbf608da-62d1-4f25-9be4-c346e4d09cc8.mp4" muted playsInline crossOrigin="anonymous" preload="auto" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></video>
+        </div>
         
         {/* Dynamic overlay based on theme */}
-        <div className={`absolute inset-0 transition-colors duration-500 ${isDark ? 'bg-[#06040A]/60' : 'bg-slate-50/80 backdrop-blur-[2px]'}`}></div>
+        <div className={`absolute inset-0 transition-all duration-1000 ${isDark ? 'bg-[#06040A]/60' : 'bg-slate-50/40 backdrop-blur-[2px]'}`}></div>
       </div>
       <canvas id="particles-canvas" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}></canvas>
     </>
