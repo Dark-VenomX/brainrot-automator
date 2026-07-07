@@ -477,6 +477,11 @@ export default function WorkspacePage() {
                           </Button>
                         </div>
                       </div>
+                      {sourceUrl && (sourceUrl.startsWith('http') || sourceUrl.startsWith('blob:') || sourceUrl.startsWith('data:')) && (
+                        <div className="mt-3 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 aspect-video relative bg-black">
+                          <video src={sourceUrl} controls className="w-full h-full object-contain" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       <Label className="font-semibold text-slate-700 dark:text-gray-300 cursor-pointer" onClick={() => setIsBatchMode(!isBatchMode)}>
