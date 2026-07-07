@@ -40,6 +40,10 @@ interface CreateVideoOptions {
   voice_name?: string;
   target_account_ids?: string[];
   auto_schedule?: boolean;
+  aspect_ratio?: '16:9' | '9:16';
+  niche?: string;
+  bg_music?: string;
+  font_style?: string;
 }
 
 interface SchedulerSettings {

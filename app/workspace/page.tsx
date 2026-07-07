@@ -92,6 +92,13 @@ export default function WorkspacePage() {
   const [voiceName, setVoiceName] = useState('en-US-AriaNeural');
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [autoSchedule, setAutoSchedule] = useState(false);
+  
+  // New features state
+  const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('9:16');
+  const [niche, setNiche] = useState('Reddit AITA Stories');
+  const [customNiche, setCustomNiche] = useState('');
+  const [bgMusic, setBgMusic] = useState('none');
+  const [fontStyle, setFontStyle] = useState('classic');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -162,6 +169,10 @@ export default function WorkspacePage() {
         voice_name: voiceName,
         target_account_ids: selectedAccounts,
         auto_schedule: autoSchedule,
+        aspect_ratio: aspectRatio,
+        niche: niche === 'Custom' ? customNiche : niche,
+        bg_music: bgMusic,
+        font_style: fontStyle,
       });
 
       toast.success('Video queued for processing');
@@ -360,7 +371,22 @@ export default function WorkspacePage() {
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="source-url" className="font-semibold text-gray-300">YouTube Video URL <span className="text-red-500">*</span></Label>
+                      <Label className="font-semibold text-gray-300">Aspect Ratio</Label>
+                      <div className="flex gap-4">
+                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '9:16' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
+                          <input type="radio" name="aspectRatio" value="9:16" className="hidden" checked={aspectRatio === '9:16'} onChange={() => setAspectRatio('9:16')} />
+                          <div className="w-3 h-5 border-2 border-current rounded-sm"></div>
+                          <span className="font-medium">Vertical (9:16)</span>
+                        </label>
+                        <label className={`flex items-center justify-center gap-2 px-4 py-3 border rounded-xl cursor-pointer transition-all flex-1 ${aspectRatio === '16:9' ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-white/10 text-gray-400 hover:border-white/30'}`}>
+                          <input type="radio" name="aspectRatio" value="16:9" className="hidden" checked={aspectRatio === '16:9'} onChange={() => setAspectRatio('16:9')} />
+                          <div className="w-5 h-3 border-2 border-current rounded-sm"></div>
+                          <span className="font-medium">Horizontal (16:9)</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="source-url" className="font-semibold text-gray-300">Video URL (YouTube or Direct MP4) <span className="text-red-500">*</span></Label>
                       <Input
                         id="source-url"
                         placeholder="https://www.youtube.com/watch?v=..."
@@ -457,6 +483,69 @@ export default function WorkspacePage() {
                         <option value="en-AU-NatashaNeural">Natasha (AU Female - Energetic)</option>
                       </select>
                     </div>
+                    <div className="space-y-2 pt-2 border-t border-white/10 mt-4">
+                      <Label htmlFor="niche" className="font-semibold text-gray-300">Content Niche</Label>
+                      <select
+                        id="niche"
+                        className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                        value={niche}
+                        onChange={(e) => setNiche(e.target.value)}
+                      >
+                        <option value="Reddit AITA Stories">Reddit AITA Stories</option>
+                        <option value="Shower Thoughts">Shower Thoughts</option>
+                        <option value="Dark Psychology">Dark Psychology</option>
+                        <option value="Motivation">Motivation & Success</option>
+                        <option value="Sigma Grindset">Sigma Grindset</option>
+                        <option value="Historical Mysteries">Historical Mysteries</option>
+                        <option value="Conspiracy Theories">Conspiracy Theories</option>
+                        <option value="True Crime">True Crime</option>
+                        <option value="Creepypasta">Creepypasta</option>
+                        <option value="Tech Trivia">Tech Trivia</option>
+                        <option value="Fun Facts">Fun Facts</option>
+                        <option value="Custom">Custom Niche...</option>
+                      </select>
+                      {niche === 'Custom' && (
+                        <Input 
+                          placeholder="Type your custom niche..." 
+                          value={customNiche} 
+                          onChange={(e) => setCustomNiche(e.target.value)}
+                          className="mt-2 bg-black/40 border-white/10 text-white"
+                        />
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="bg-music" className="font-semibold text-gray-300">Background Music</Label>
+                        <select
+                          id="bg-music"
+                          className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                          value={bgMusic}
+                          onChange={(e) => setBgMusic(e.target.value)}
+                        >
+                          <option value="none">None</option>
+                          <option value="lofi">Chill Lo-Fi</option>
+                          <option value="phonk">Aggressive Phonk</option>
+                          <option value="trap">Trap Beat</option>
+                          <option value="creepy">Creepy/Suspense</option>
+                        </select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="font-style" className="font-semibold text-gray-300">Subtitle Font</Label>
+                        <select
+                          id="font-style"
+                          className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
+                          value={fontStyle}
+                          onChange={(e) => setFontStyle(e.target.value)}
+                        >
+                          <option value="classic">Classic (Yellow/Black)</option>
+                          <option value="mrbeast">MrBeast (Bold/Colorful)</option>
+                          <option value="minimal">Minimal (White/No Background)</option>
+                        </select>
+                      </div>
+                    </div>
+
                   </CardContent>
                 </Card>
               </div>
@@ -625,6 +714,31 @@ export default function WorkspacePage() {
                                 )}
                                 
                                 {video.status === 'posted' && (
+
+                                {video.status === 'ready' && (video as any).metadata?.viral_strategy && (
+                                  <div className="mt-4 p-4 bg-[#0F0A19] border border-white/10 rounded-xl">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Sparkles className="w-4 h-4 text-purple-400" />
+                                      <span className="font-semibold text-sm text-purple-100">AI Viral Strategy</span>
+                                    </div>
+                                    <div className="space-y-3 text-sm">
+                                      <div>
+                                        <span className="text-gray-400">Caption: </span>
+                                        <span className="text-gray-200">{(video as any).metadata.viral_strategy.captions?.[0]}</span>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-400">Hashtags: </span>
+                                        <span className="text-blue-400">{(video as any).metadata.viral_strategy.hashtags?.join(' ')}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                        <span className="text-gray-400">Best time to post: </span>
+                                        <span className="text-emerald-400 font-medium">{(video as any).metadata.viral_strategy.optimal_timing}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
                                   <div className="mt-3 text-sm text-emerald-400 flex items-center gap-1.5">
                                     <CheckCircle className="w-4 h-4" />
                                     Posted on {new Date(video.posted_at!).toLocaleDateString()}

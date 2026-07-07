@@ -57,20 +57,24 @@ export class AIService {
     this.init();
   }
 
-  async generateScript(topic: string, videoContext?: string): Promise<GeminiResponse> {
+  async generateScript(topic: string, videoContext?: string, niche: string = 'General', aspectRatio: string = '9:16'): Promise<GeminiResponse> {
     if (!this.model) this.init();
     await waitForRateLimit();
 
-    const systemPrompt = `You are an expert scriptwriter for short-form viral videos (YouTube Shorts, Instagram Reels, TikTok).
-Your scripts are designed for maximum retention and engagement.
+    const targetLengthSeconds = aspectRatio === '16:9' ? 120 : 45; // Longer for horizontal
+    const wordTarget = Math.round((targetLengthSeconds / 60) * 150); // ~150 wpm
+
+    const systemPrompt = `You are an expert scriptwriter for short-form viral videos (YouTube Shorts, Instagram Reels, TikTok) and long-form YouTube.
+Your scripts are designed for maximum retention and engagement, targeting the "${niche}" niche.
 
 RULES:
-1. The script MUST be exactly 40-50 seconds when read at a normal pace (approximately 120 words)
-2. Hook the viewer in the first 3 seconds
-3. Use simple, conversational language
-4. Include a clear call-to-action at the end
-5. NO emojis or special characters - only plain text
-6. NO questions or prompts like "Have you ever..." - make definitive statements
+1. The script MUST be exactly ${wordTarget} words to hit the ${targetLengthSeconds}-second runtime.
+2. Hook the viewer in the FIRST 3 SECONDS with an aggressive, curiosity-inducing statement.
+3. Use simple, conversational, "brainrot-style" language tailored to Gen-Z if appropriate for the niche.
+4. Include a clear call-to-action at the end (e.g., "Subscribe for more").
+5. NO emojis or special characters in the script - only plain text for the TTS engine.
+6. NO questions or prompts like "Have you ever..." - make definitive, bold statements.
+7. You MUST also generate a Viral Strategy (captions with emojis, exact best time to post, and hashtags).
 
 ${videoContext ? `Context from video: ${videoContext}` : ''}
 
@@ -78,7 +82,12 @@ OUTPUT FORMAT (respond with ONLY this JSON, no markdown):
 {
   "script": "Your script here as plain text",
   "title": "A catchy title under 60 characters",
-  "hashtags": ["tag1", "tag2", "tag3"]
+  "hashtags": ["tag1", "tag2", "tag3"],
+  "viral_strategy": {
+    "captions": ["Caption option 1 🤯", "Caption option 2 🔥", "Caption option 3 👀"],
+    "hashtags": ["#viral", "#${niche.replace(/\s+/g, '')}"],
+    "optimal_timing": "7:30 PM EST"
+  }
 }`;
 
     try {

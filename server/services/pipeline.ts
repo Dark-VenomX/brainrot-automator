@@ -96,15 +96,22 @@ export class VideoPipeline {
       let script = video.generated_script;
       let title = video.auto_generated_title;
       let hashtags = video.auto_generated_hashtags;
+      let metadataObj = video.metadata || {};
 
       if (!script || video.topic_input) {
         const geminiResponse = await aiService.generateScript(
           video.topic_input || 'interesting topic',
           `Source video: ${video.source_url}`,
+          metadataObj.niche as string,
+          metadataObj.aspect_ratio as string
         );
         script = geminiResponse.script;
         title = geminiResponse.title;
         hashtags = geminiResponse.hashtags;
+        
+        if (geminiResponse.viral_strategy) {
+          metadataObj.viral_strategy = geminiResponse.viral_strategy;
+        }
       }
 
       if (!title || hashtags.length === 0) {
@@ -119,6 +126,7 @@ export class VideoPipeline {
           generated_script: script,
           auto_generated_title: title,
           auto_generated_hashtags: hashtags,
+          metadata: metadataObj,
         })
         .eq('id', videoId);
 
@@ -151,9 +159,11 @@ export class VideoPipeline {
         wordTimestamps = await whisperService.fallbackWordTimestamps(script!, ttsDuration);
       }
 
+      const fontStyle = video.metadata?.font_style as string || 'classic';
       const assPath = await videoService.writeASSSubtitle(
         wordTimestamps,
         path.join(this.tempDir, `${tempPrefix}_subs.ass`),
+        fontStyle
       );
       cleanupFiles.push(assPath);
 
@@ -169,6 +179,9 @@ export class VideoPipeline {
 
       const outputPath = path.join(this.outputDir, `${videoId}.mp4`);
 
+      const bgMusic = video.metadata?.bg_music as string || 'none';
+      const aspectRatio = video.metadata?.aspect_ratio as string || '9:16';
+
       await videoService.renderFinalVideo(
         downloadedFile,
         ttsPath,
@@ -176,6 +189,8 @@ export class VideoPipeline {
         outputPath,
         0.1,
         1.0,
+        bgMusic,
+        aspectRatio
       );
 
       await supabaseAdmin
