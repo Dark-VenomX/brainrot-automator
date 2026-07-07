@@ -302,37 +302,33 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div className="min-h-screen text-white pb-24">
+    <div className="min-h-screen pb-24 text-slate-900 dark:text-white">
       {/* Header */}
-      <header className="border-b border-white/5 bg-[#06040A]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 shadow-md flex items-center justify-center">
-              <Video className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white tracking-tight">brainrot.ai</span>
-          </Link>
-          <div className="flex items-center gap-2">
+      
+
+      {/* Main Content */}
+      <main className="max-w-5xl mx-auto px-6 py-10">
+
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your automated video pipeline.</p>
+          </div>
+          <div className="flex items-center gap-3">
             <SchedulePlanner onSaved={() => setTrackerRefreshKey(k => k + 1)} />
             <SandboxPanel />
-            <Link href="/how-to-use">
-              <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                <BookOpen className="w-4 h-4 mr-2" />
-                Docs
-              </Button>
-            </Link>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <Button variant="outline" className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-white shadow-sm transition-all">
                   <Settings className="w-4 h-4 mr-2" />
-                  Settings
+                  Connect
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-[#0F0A19] border-slate-200 dark:border-white/10">
                 <DialogHeader>
-                  <DialogTitle>Account Settings</DialogTitle>
-                  <DialogDescription>
-                    Manage your linked social accounts
+                  <DialogTitle className="text-slate-900 dark:text-white">Connect Accounts</DialogTitle>
+                  <DialogDescription className="text-slate-500 dark:text-slate-400">
+                    Manage your linked social accounts for auto-posting
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
@@ -342,7 +338,7 @@ export default function WorkspacePage() {
                       window.open(res.authUrl, '_blank');
                     }}
                     variant="outline"
-                    className="w-full justify-start hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-950/30 transition-all"
+                    className="w-full justify-start hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-950/30 transition-all border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
                   >
                     <Youtube className="w-5 h-5 mr-3 text-red-500" />
                     Link YouTube Channel
@@ -353,28 +349,16 @@ export default function WorkspacePage() {
                       window.open(res.authUrl, '_blank');
                     }}
                     variant="outline"
-                    className="w-full justify-start hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 dark:hover:bg-pink-950/30 transition-all"
+                    className="w-full justify-start hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 dark:hover:bg-pink-950/30 transition-all border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300"
                   >
                     <Instagram className="w-5 h-5 mr-3 text-pink-500" />
                     Link Instagram Account
-                  </Button>
-                  <Separator />
-                  <Button
-                    onClick={signOut}
-                    variant="destructive"
-                    className="w-full"
-                  >
-                    Sign Out
                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
         {loading && accounts.length === 0 && videos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="w-10 h-10 flex items-center justify-center mb-2"><div className="loader scale-[0.5]"></div></div>
@@ -387,10 +371,10 @@ export default function WorkspacePage() {
             </div>
 
         <Tabs defaultValue="create" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-[400px] mx-auto p-1 bg-white/5 rounded-xl border border-white/10">
-            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Create</TabsTrigger>
-            <TabsTrigger value="queue" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Queue</TabsTrigger>
-            <TabsTrigger value="accounts" className="rounded-lg data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">Accounts</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-[400px] p-1.5 bg-slate-100 dark:bg-[#1E1A29] rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner transition-colors duration-300">
+            <TabsTrigger value="create" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Create</TabsTrigger>
+            <TabsTrigger value="queue" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Queue</TabsTrigger>
+            <TabsTrigger value="accounts" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Accounts</TabsTrigger>
           </TabsList>
 
           {/* Create Tab */}

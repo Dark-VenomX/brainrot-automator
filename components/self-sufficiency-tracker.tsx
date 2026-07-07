@@ -57,35 +57,38 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
   // Visual config based on state
   const config = isCritical
     ? {
-        cardClass: 'border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40',
-        iconBg: 'bg-red-100 dark:bg-red-900',
-        iconColor: 'text-red-600 dark:text-red-400',
+        cardClass: 'border-red-500/20 bg-gradient-to-br from-white to-red-50/50 dark:from-black dark:to-red-950/20 backdrop-blur-xl',
+        iconBg: 'bg-red-500/10 dark:bg-red-500/20',
+        iconColor: 'text-red-500 dark:text-red-400',
         icon: <BatteryLow className="w-6 h-6" />,
-        title: 'Queue needs attention',
-        description: 'Your content buffer is running low. Add more videos to stay self-sufficient.',
-        progressColor: 'bg-red-500',
-        ringClass: 'ring-2 ring-red-300 dark:ring-red-800 animate-pulse',
+        title: 'Queue Needs Attention',
+        description: 'Your content buffer is critically low. Add more videos immediately to stay self-sufficient.',
+        progressColor: 'bg-gradient-to-r from-red-500 to-orange-500',
+        ringClass: 'shadow-[0_0_30px_-5px_rgba(239,68,68,0.2)]',
+        valueColor: 'text-red-600 dark:text-red-400',
       }
     : isWarning
       ? {
-          cardClass: 'border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40',
-          iconBg: 'bg-amber-100 dark:bg-amber-900',
-          iconColor: 'text-amber-600 dark:text-amber-400',
+          cardClass: 'border-amber-500/20 bg-gradient-to-br from-white to-amber-50/50 dark:from-black dark:to-amber-950/20 backdrop-blur-xl',
+          iconBg: 'bg-amber-500/10 dark:bg-amber-500/20',
+          iconColor: 'text-amber-500 dark:text-amber-400',
           icon: <BatteryMedium className="w-6 h-6" />,
-          title: 'Buffer is moderate',
+          title: 'Buffer is Moderate',
           description: 'You have a few days of content. Consider adding more to build a safety margin.',
-          progressColor: 'bg-amber-500',
-          ringClass: '',
+          progressColor: 'bg-gradient-to-r from-amber-500 to-yellow-400',
+          ringClass: 'shadow-[0_0_30px_-5px_rgba(245,158,11,0.15)]',
+          valueColor: 'text-amber-600 dark:text-amber-400',
         }
       : {
-          cardClass: 'border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40',
-          iconBg: 'bg-emerald-100 dark:bg-emerald-900',
-          iconColor: 'text-emerald-600 dark:text-emerald-400',
+          cardClass: 'border-emerald-500/20 bg-gradient-to-br from-white to-emerald-50/50 dark:from-black dark:to-emerald-950/20 backdrop-blur-xl',
+          iconBg: 'bg-emerald-500/10 dark:bg-emerald-500/20',
+          iconColor: 'text-emerald-500 dark:text-emerald-400',
           icon: <BatteryFull className="w-6 h-6" />,
-          title: 'Queue is healthy',
-          description: 'You have a solid content buffer. Your automation is self-sufficient.',
-          progressColor: 'bg-emerald-500',
-          ringClass: '',
+          title: 'Queue is Healthy',
+          description: 'You have a solid content buffer. Your automation is completely self-sufficient.',
+          progressColor: 'bg-gradient-to-r from-emerald-500 to-teal-400',
+          ringClass: 'shadow-[0_0_30px_-5px_rgba(16,185,129,0.15)]',
+          valueColor: 'text-emerald-600 dark:text-emerald-400',
         };
 
   // Progress relative to a 14-day target
@@ -93,55 +96,55 @@ export function SelfSufficiencyTracker({ refreshKey }: SelfSufficiencyTrackerPro
   const progressPct = Math.min((days / targetDays) * 100, 100);
 
   return (
-    <Card className={`border-2 shadow-lg transition-all ${config.cardClass} ${config.ringClass}`}>
-      <CardHeader className="pb-3">
+    <Card className={`border shadow-lg transition-all duration-500 ${config.cardClass} ${config.ringClass}`}>
+      <CardHeader className="pb-3 border-b border-slate-200/50 dark:border-white/5">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-xl ${config.iconBg} flex items-center justify-center ${config.iconColor}`}>
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl ${config.iconBg} flex items-center justify-center ${config.iconColor} shadow-inner`}>
               {config.icon}
             </div>
             <div>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                 Self-Sufficiency Tracker
               </CardTitle>
-              <CardDescription className={isCritical ? 'text-red-700 dark:text-red-300 font-medium' : ''}>
+              <CardDescription className="font-medium text-slate-500 dark:text-slate-400 mt-1">
                 {config.title}
               </CardDescription>
             </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-baseline gap-2">
-          <span className={`text-4xl font-bold ${config.iconColor}`}>{days}</span>
-          <span className="text-lg text-muted-foreground">day{days === 1 ? '' : 's'} of content queued</span>
+      <CardContent className="pt-6">
+        <div className="flex items-end gap-2 mb-4">
+          <span className={`text-5xl font-black tracking-tighter ${config.valueColor}`}>
+            {days}
+          </span>
+          <span className="text-slate-500 dark:text-slate-400 font-medium pb-1">
+            days of content queued
+          </span>
+        </div>
+        
+        <div className="h-3 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-6 shadow-inner">
+          <div 
+            className={`h-full rounded-full transition-all duration-1000 ease-out ${config.progressColor}`}
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
 
-        <Progress value={progressPct} className={`h-2 ${config.progressColor}`} />
-
-        <div className="grid grid-cols-2 gap-3 pt-1">
+        <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-2 text-sm">
-            <CalendarDays className="w-4 h-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Queued videos:</span>
-            <span className="font-semibold">{scheduledCount}</span>
+            <Clock className="w-4 h-4 text-slate-400" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium">Queued videos: <span className="text-slate-900 dark:text-white font-bold">{scheduledCount}</span></span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Slots / day:</span>
-            <span className="font-semibold">{slotsPerDay}</span>
+            <CalendarDays className="w-4 h-4 text-slate-400" />
+            <span className="text-slate-600 dark:text-slate-300 font-medium">Slots / day: <span className="text-slate-900 dark:text-white font-bold">{slotsPerDay}</span></span>
           </div>
         </div>
-
-        {isCritical && (
-          <div className="text-sm text-red-700 dark:text-red-300 font-medium pt-1">
-            {config.description}
-          </div>
-        )}
-        {!isCritical && (
-          <div className="text-sm text-muted-foreground pt-1">
-            {config.description}
-          </div>
-        )}
+        
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-6 font-medium">
+          {config.description}
+        </p>
       </CardContent>
     </Card>
   );

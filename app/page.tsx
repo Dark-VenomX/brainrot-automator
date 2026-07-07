@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { ThemeToggle } from '../components/theme-toggle';
 
 export default function BrainrotLandingPage() {
   useEffect(() => {
@@ -73,7 +74,6 @@ export default function BrainrotLandingPage() {
         .veldara-theme {
           font-family: var(--font-inter), 'Inter', sans-serif; 
           background: transparent; 
-          color: #fff;
           min-height: 100vh;
         }
         .veldara-theme .fixed { position: fixed; }
@@ -83,50 +83,58 @@ export default function BrainrotLandingPage() {
         
         .veldara-theme section { scroll-margin-top: 80px; }
 
+        /* Theme Variables */
+        html .veldara-theme {
+          --text-primary: #0f172a;
+          --text-secondary: #475569;
+          --bg-nav: rgba(248, 250, 252, 0.85);
+          --bg-card: rgba(255, 255, 255, 0.6);
+          --border-card: rgba(168, 85, 247, 0.1);
+          --overlay: linear-gradient(to top, rgba(248, 250, 252, 0.9) 0%, transparent 50%);
+        }
+        
+        html.dark .veldara-theme {
+          --text-primary: #ffffff;
+          --text-secondary: #9ca3af;
+          --bg-nav: rgba(6, 4, 10, 0.8);
+          --bg-card: rgba(15, 10, 25, 0.6);
+          --border-card: rgba(168, 85, 247, 0.2);
+          --overlay: linear-gradient(to top, rgba(6, 4, 10, 0.9) 0%, transparent 50%);
+        }
+
+        .veldara-theme { color: var(--text-primary); }
+
         /* Nav */
         .veldara-theme nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 50;
           display: flex; align-items: center; justify-content: space-between;
           padding: 1.25rem 2.5rem;
-          background: linear-gradient(to bottom, rgba(6,4,10,0.8), transparent);
-          backdrop-filter: blur(4px);
+          background: var(--bg-nav);
+          backdrop-filter: blur(8px);
+          transition: background 0.3s;
         }
-        .veldara-theme nav .logo { font-weight: 700; font-size: 1.25rem; color: #fff; letter-spacing: -0.025em; text-transform: lowercase; }
+        .veldara-theme nav .logo { font-weight: 700; font-size: 1.25rem; color: var(--text-primary); letter-spacing: -0.025em; text-transform: lowercase; }
         .veldara-theme nav .nav-links { display: flex; align-items: center; gap: 2rem; }
-        .veldara-theme nav .nav-links a { font-size: 0.875rem; color: #9ca3af; text-decoration: none; transition: color 0.2s; font-weight: 500; }
+        .veldara-theme nav .nav-links a { font-size: 0.875rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; font-weight: 500; }
         .veldara-theme nav .nav-links a:hover { color: #A855F7; }
         .veldara-theme nav .social { display: flex; align-items: center; gap: 1rem; }
-        .veldara-theme nav .social a { color: #9ca3af; transition: color 0.2s; }
-        .veldara-theme nav .social a:hover { color: #06B6D4; }
-        .veldara-theme nav .social svg { width: 1.25rem; height: 1.25rem; }
 
         /* Hero */
-        #hero {
-          position: relative; height: 100vh; width: 100%; display: flex; flex-direction: column;
-        }
-        #hero .gradient-overlay {
-          position: absolute; inset: 0;
-          background: linear-gradient(to top, rgba(6, 4, 10, 0.8) 0%, transparent 50%);
-        }
+        #hero { position: relative; height: 100vh; width: 100%; display: flex; flex-direction: column; }
+        #hero .gradient-overlay { position: absolute; inset: 0; background: var(--overlay); transition: background 0.3s; }
         #hero .content {
           position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column;
-          align-items: center; justify-content: flex-end; text-align: center;
-          padding: 0 1.5rem 6rem;
+          align-items: center; justify-content: flex-end; text-align: center; padding: 0 1.5rem 6rem;
         }
         #hero .subtitle { font-size: 0.875rem; color: #a855f7; margin-bottom: 1rem; letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; }
         #hero h1 { font-size: clamp(2rem, 6vw, 4rem); font-weight: 700; line-height: 1.15; max-width: 52rem; letter-spacing: -0.02em; }
-        #hero h1 .underlined {
-          position: relative; display: inline-block;
-        }
+        #hero h1 .underlined { position: relative; display: inline-block; }
         #hero h1 .underlined .line {
           position: absolute; bottom: 0.15rem; left: 0; width: 100%; height: 8px;
-          background: linear-gradient(90deg, #A855F7, #06B6D4); border-radius: 4px;
-          opacity: 0.8;
+          background: linear-gradient(90deg, #A855F7, #06B6D4); border-radius: 4px; opacity: 0.8;
         }
         #hero h1 .underlined span { position: relative; z-index: 1; }
-        #hero .ctas {
-          display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center;
-        }
+        #hero .ctas { display: flex; align-items: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap; justify-content: center; }
         #hero .cta-btn {
           display: inline-flex; align-items: center; gap: 0.5rem;
           background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; font-weight: 600; border-radius: 0.5rem;
@@ -134,9 +142,7 @@ export default function BrainrotLandingPage() {
           box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
         }
         #hero .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(168, 85, 247, 0.5); }
-        #hero .bounce-arrow {
-          position: relative; z-index: 10; display: flex; justify-content: center; padding-bottom: 2rem;
-        }
+        #hero .bounce-arrow { position: relative; z-index: 10; display: flex; justify-content: center; padding-bottom: 2rem; }
         #hero .bounce-arrow svg { width: 1.5rem; height: 1.5rem; color: #a855f7; animation: bounce 1s infinite; }
 
         @keyframes bounce {
@@ -145,92 +151,67 @@ export default function BrainrotLandingPage() {
         }
 
         /* Features */
-        #features {
-          position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center;
-        }
+        #features { position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center; }
         .section-title {
           font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 4rem; text-align: center;
-          background: linear-gradient(135deg, #fff 40%, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background: linear-gradient(135deg, var(--text-primary) 40%, #A855F7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .feature-grid {
-          display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 72rem; width: 100%;
-        }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 72rem; width: 100%; }
         .feature-card {
-          background: rgba(15, 10, 25, 0.6); border: 1px solid rgba(168, 85, 247, 0.2); padding: 2rem; border-radius: 0.75rem;
-          display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; transition: transform 0.2s, border-color 0.2s;
+          background: var(--bg-card); border: 1px solid var(--border-card); padding: 2rem; border-radius: 0.75rem;
+          display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; transition: transform 0.2s, border-color 0.2s, background 0.3s;
         }
         .feature-card:hover { transform: translateY(-4px); border-color: rgba(168, 85, 247, 0.6); }
         .feature-icon {
           display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 0.5rem;
           background: rgba(168, 85, 247, 0.2); color: #A855F7;
         }
-        .feature-card h3 { font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
-        .feature-card p { color: #9ca3af; font-size: 0.9rem; line-height: 1.6; }
+        .feature-card h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+        .feature-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
 
         /* Cards (Pipeline) */
-        #fixed-cards {
-          position: fixed; bottom: 0; left: 0; right: 0; z-index: 4;
-          padding: 3rem 2.5rem; opacity: 0; pointer-events: none;
-        }
-        #fixed-cards .grid {
-          max-width: 72rem; margin: 0 auto;
-          display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem;
-        }
+        #fixed-cards { position: fixed; bottom: 0; left: 0; right: 0; z-index: 4; padding: 3rem 2.5rem; opacity: 0; pointer-events: none; }
+        #fixed-cards .grid { max-width: 72rem; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
         #fixed-cards .card {
-          background: rgba(15, 10, 25, 0.4);
-          border: 1px solid rgba(168, 85, 247, 0.15);
-          padding: 2rem;
-          border-radius: 0.75rem;
-          backdrop-filter: blur(12px);
+          background: var(--bg-card); border: 1px solid var(--border-card); padding: 2rem; border-radius: 0.75rem; backdrop-filter: blur(12px);
+          transition: background 0.3s;
         }
-        #fixed-cards .card h3 { font-size: 1.35rem; font-weight: 700; color: #fff; margin-bottom: 1rem; letter-spacing: -0.01em; }
-        #fixed-cards .card p { color: #9ca3af; font-size: 0.9rem; line-height: 1.6; }
+        #fixed-cards .card h3 { font-size: 1.35rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; letter-spacing: -0.01em; }
+        #fixed-cards .card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
         #fixed-cards .step { font-size: 0.75rem; font-weight: 700; color: #06B6D4; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
 
         /* Pricing */
-        #pricing {
-          position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center;
-        }
-        .pricing-grid {
-          display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 60rem; width: 100%;
-        }
+        #pricing { position: relative; z-index: 10; padding: 6rem 2.5rem; background: transparent; display: flex; flex-direction: column; align-items: center; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 60rem; width: 100%; }
         .pricing-card {
-          background: rgba(15, 10, 25, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 3rem 2rem; border-radius: 1rem;
+          background: var(--bg-card); border: 1px solid var(--border-card); padding: 3rem 2rem; border-radius: 1rem;
           display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; position: relative;
         }
-        .pricing-card.popular {
-          border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15);
-        }
+        .pricing-card.popular { border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 8px 32px rgba(168, 85, 247, 0.15); }
         .pricing-card.popular::before {
           content: 'Most Popular'; position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);
           background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; font-size: 0.75rem; font-weight: 700;
           padding: 0.25rem 1rem; border-radius: 1rem; text-transform: uppercase; letter-spacing: 0.05em;
         }
-        .pricing-card h3 { font-size: 1.5rem; font-weight: 700; color: #fff; }
-        .pricing-card .price { font-size: 3rem; font-weight: 800; color: #fff; display: flex; align-items: flex-start; justify-content: center; }
-        .pricing-card .price span { font-size: 1rem; font-weight: 500; color: #9ca3af; margin-top: 0.5rem; }
+        .pricing-card h3 { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); }
+        .pricing-card .price { font-size: 3rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: flex-start; justify-content: center; }
+        .pricing-card .price span { font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-top: 0.5rem; }
         .pricing-card ul { list-style: none; display: flex; flex-direction: column; gap: 1rem; text-align: left; width: 100%; margin-top: 1rem; }
-        .pricing-card ul li { display: flex; align-items: center; gap: 0.75rem; color: #d1d5db; font-size: 0.95rem; }
+        .pricing-card ul li { display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
         .pricing-card ul li svg { width: 1.25rem; height: 1.25rem; color: #06B6D4; flex-shrink: 0; }
-        .pricing-btn {
-          width: 100%; padding: 1rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s;
-        }
+        .pricing-btn { width: 100%; padding: 1rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s; }
         .pricing-btn.primary { background: linear-gradient(135deg, #A855F7, #7C3AED); color: #fff; }
         .pricing-btn.primary:hover { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4); }
-        .pricing-btn.secondary { background: rgba(255, 255, 255, 0.1); color: #fff; }
-        .pricing-btn.secondary:hover { background: rgba(255, 255, 255, 0.2); }
+        .pricing-btn.secondary { background: rgba(168, 85, 247, 0.1); color: var(--text-primary); }
+        .pricing-btn.secondary:hover { background: rgba(168, 85, 247, 0.2); }
 
         /* Footer */
-        footer {
-          position: relative; z-index: 10; background: transparent; border-top: 1px solid rgba(255, 255, 255, 0.05);
-          padding: 3rem 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center;
-        }
-        footer p { color: #6b7280; font-size: 0.875rem; }
+        footer { position: relative; z-index: 10; background: transparent; border-top: 1px solid var(--border-card); padding: 3rem 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+        footer p { color: var(--text-secondary); font-size: 0.875rem; }
         footer .links { display: flex; gap: 1.5rem; }
-        footer .links a { color: #9ca3af; text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
-        footer .links a:hover { color: #fff; }
+        footer .links a { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; transition: color 0.2s; }
+        footer .links a:hover { color: var(--text-primary); }
 
-        /* Responsive */
         @media (max-width: 768px) {
           .veldara-theme nav { padding: 1rem; flex-wrap: wrap; gap: 1rem; justify-content: center; }
           .veldara-theme nav .nav-links { font-size: 0.85rem; gap: 1rem; justify-content: center; width: 100%; }
@@ -286,7 +267,8 @@ export default function BrainrotLandingPage() {
           </div>
         </div>
         <div className="social">
-          <Link href="/login" className="bg-white text-black px-4 py-1.5 rounded text-sm font-bold hover:bg-gray-200 transition-colors uppercase tracking-wider">
+          <ThemeToggle />
+          <Link href="/login" className="bg-slate-900 dark:bg-white text-white dark:text-black px-4 py-1.5 rounded text-sm font-bold hover:opacity-90 transition-opacity uppercase tracking-wider">
             Open Workspace
           </Link>
         </div>

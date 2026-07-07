@@ -1,7 +1,7 @@
 import type { WhisperWord, GeminiResponse } from '../types';
 export declare class AIService {
     private genAI;
-    private model;
+    private models;
     private apiKey;
     private initialized;
     constructor(apiKey?: string);

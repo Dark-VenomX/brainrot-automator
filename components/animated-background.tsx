@@ -1,19 +1,34 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useTheme } from 'next-themes';
 
 export function AnimatedBackground() {
+  const pathname = usePathname();
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => setMounted(true), []);
+
+  const isDark = mounted ? (theme === 'dark' || (theme === 'system' && systemTheme === 'dark')) : true;
+  const isWorkspace = pathname?.startsWith('/workspace');
+
   useEffect(() => {
-    // ===================== SCROLL VIDEO =====================
+    if (isWorkspace) return;
+
+    // ===================== SCROLL VIDEO (FLORAL) =====================
     const VIDEO_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260616_212935_bbf608da-62d1-4f25-9be4-c346e4d09cc8.mp4';
     const canvas = document.getElementById('video-canvas') as HTMLCanvasElement;
     const videoEl = document.getElementById('video-fallback') as HTMLVideoElement;
-    const ctx = canvas?.getContext('2d');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
     let frames: ImageBitmap[] = [];
     let framesReady = false;
     let lastFrameIndex = -1;
     let videoSeeking = false;
     let animationFrameId: number;
+    let pAnimId: number;
 
     function resizeCanvas() {
       if (!canvas) return;
@@ -58,94 +73,117 @@ export function AnimatedBackground() {
           await new Promise<void>((resolve, reject) => {
             const onSeeked = () => { video.removeEventListener('seeked', onSeeked); resolve(); };
             video.addEventListener('seeked', onSeeked);
-            setTimeout(() => { video.removeEventListener('seeked', onSeeked); reject(); }, 3000);
+            setTimeout(() => { video.removeEventListener('seeked', onSeeked); resolve(); }, 1000);
           });
-          const bitmap = await createImageBitmap(video, { resizeWidth: scaledWidth, resizeHeight: scaledHeight });
-          frames.push(bitmap);
+          
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = scaledWidth;
+          tempCanvas.height = scaledHeight;
+          const tCtx = tempCanvas.getContext('2d');
+          if (tCtx) {
+            tCtx.drawImage(video, 0, 0, scaledWidth, scaledHeight);
+            const bitmap = await createImageBitmap(tempCanvas);
+            frames.push(bitmap);
+          }
         }
-
-        if (frames.length > 0 && canvas && videoEl) {
-          framesReady = true;
-          canvas.style.visibility = 'visible';
-          videoEl.style.display = 'none';
-        }
+        
+        framesReady = true;
         URL.revokeObjectURL(objectUrl);
-      } catch(e) { /* fallback to video seeking */ }
-    }
-
-    function getScrollBounds() {
-      const vh = window.innerHeight;
-      return { start: vh * 0.5, end: document.documentElement.scrollHeight - vh };
-    }
-
-    function getProgress() {
-      const { start, end } = getScrollBounds();
-      const range = end - start;
-      if (range <= 0) return 0;
-      return Math.max(0, Math.min(1, (window.scrollY - start) / range));
-    }
-
-    function drawFrame(frame: ImageBitmap) {
-      if (!canvas || !ctx) return;
-      const cw = canvas.width, ch = canvas.height;
-      const s = Math.max(cw / frame.width, ch / frame.height);
-      const dw = frame.width * s, dh = frame.height * s;
-      ctx.drawImage(frame, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-    }
-
-    function videoTick() {
-      if (!canvas || !videoEl) return;
-      const progress = getProgress();
-      if (framesReady && frames.length > 0) {
-        const idx = Math.round(progress * (frames.length - 1));
-        if (idx !== lastFrameIndex) {
-          lastFrameIndex = idx;
-          if (frames[idx]) drawFrame(frames[idx]);
+        if (videoEl) {
+          videoEl.style.display = 'none';
+          videoEl.pause();
         }
-      } else if (videoEl.duration && isFinite(videoEl.duration) && videoEl.readyState >= 1) {
-        const target = progress * videoEl.duration;
-        if (!videoSeeking && Math.abs(videoEl.currentTime - target) > 0.001) {
-          videoSeeking = true;
-          videoEl.currentTime = target;
+      } catch (err) {
+        console.warn("Frame extraction failed, using video fallback", err);
+        framesReady = false;
+        if (videoEl) {
+          videoEl.style.opacity = '1';
+          videoEl.style.display = 'block';
+          videoEl.play().catch(e => console.warn("Video playback blocked", e));
         }
       }
-      animationFrameId = requestAnimationFrame(videoTick);
     }
 
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    extractFrames();
+
+    function renderFrame() {
+      if (!canvas || !ctx || !framesReady || frames.length === 0) return;
+      
+      const scrollY = window.scrollY;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const scrollProgress = Math.max(0, Math.min(1, scrollY / maxScroll));
+      const targetFrame = Math.floor(scrollProgress * (frames.length - 1));
+      
+      if (targetFrame !== lastFrameIndex) {
+        const frame = frames[targetFrame];
+        
+        const canvasRatio = canvas.width / canvas.height;
+        const frameRatio = frame.width / frame.height;
+        
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (canvasRatio > frameRatio) {
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / frameRatio;
+          drawX = 0;
+          drawY = (canvas.height - drawHeight) / 2;
+        } else {
+          drawWidth = canvas.height * frameRatio;
+          drawHeight = canvas.height;
+          drawX = (canvas.width - drawWidth) / 2;
+          drawY = 0;
+        }
+        
+        ctx.fillStyle = '#06040A';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(frame, drawX, drawY, drawWidth, drawHeight);
+        lastFrameIndex = targetFrame;
+      }
+    }
+
+    function loop() {
+      if (framesReady) renderFrame();
+      animationFrameId = requestAnimationFrame(loop);
+    }
+    loop();
+
+    // Fallback sync logic
     const onSeeked = () => { videoSeeking = false; };
     const onStalled = () => { videoSeeking = false; };
-    const onLoadedData = () => { if (videoEl) videoEl.currentTime = 0; };
-
+    const onLoadedData = () => { videoSeeking = false; };
+    
     if (videoEl) {
       videoEl.addEventListener('seeked', onSeeked);
       videoEl.addEventListener('stalled', onStalled);
       videoEl.addEventListener('loadeddata', onLoadedData);
-    }
-    
-    if (canvas) {
-      canvas.style.visibility = 'hidden';
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      animationFrameId = requestAnimationFrame(videoTick);
-      extractFrames();
+      
+      const updateVideoSync = () => {
+        if (framesReady || videoSeeking) return;
+        const scrollY = window.scrollY;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        const scrollProgress = Math.max(0, Math.min(1, scrollY / maxScroll));
+        if (videoEl.duration) {
+          const targetTime = scrollProgress * (videoEl.duration - 0.1);
+          if (Math.abs(videoEl.currentTime - targetTime) > 0.1) {
+            videoSeeking = true;
+            videoEl.currentTime = targetTime;
+          }
+        }
+      };
+      window.addEventListener('scroll', updateVideoSync, { passive: true });
     }
 
-
-    // ===================== PARTICLES =====================
+    // Particles
     const pCanvas = document.getElementById('particles-canvas') as HTMLCanvasElement;
     const pCtx = pCanvas?.getContext('2d');
-    let particles: any[] = [];
-    let pAnimId: number;
+    let particles: {x: number, y: number, vx: number, vy: number, size: number, opacity: number}[] = [];
 
     function resizeParticles() {
       if (!pCanvas) return;
       pCanvas.width = window.innerWidth;
       pCanvas.height = window.innerHeight;
-      createParticles();
-    }
-
-    function createParticles() {
-      if (!pCanvas) return;
       particles = [];
       const count = Math.floor((pCanvas.width * pCanvas.height) / 12000);
       for (let i = 0; i < count; i++) {
@@ -163,6 +201,7 @@ export function AnimatedBackground() {
     function animateParticles() {
       if (!pCanvas || !pCtx) return;
       pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      const isDk = document.documentElement.classList.contains('dark');
       for (const p of particles) {
         p.x += p.vx; p.y += p.vy;
         if (p.x < 0) p.x = pCanvas.width;
@@ -171,7 +210,7 @@ export function AnimatedBackground() {
         if (p.y > pCanvas.height) p.y = 0;
         pCtx.beginPath();
         pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        pCtx.fillStyle = `rgba(255,255,255,${p.opacity})`;
+        pCtx.fillStyle = isDk ? `rgba(255,255,255,${p.opacity})` : `rgba(0,0,0,${p.opacity * 0.5})`;
         pCtx.fill();
       }
       pAnimId = requestAnimationFrame(animateParticles);
@@ -194,14 +233,34 @@ export function AnimatedBackground() {
         videoEl.removeEventListener('loadeddata', onLoadedData);
       }
     };
-  }, []);
+  }, [isWorkspace]);
 
+  if (isWorkspace) {
+    // Modern abstract tech background
+    return (
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden transition-colors duration-500">
+        <div className={`absolute inset-0 transition-opacity duration-700 ${isDark ? 'opacity-100 bg-[#0F0A19]' : 'opacity-0 bg-slate-50'}`} />
+        <div className={`absolute inset-0 transition-opacity duration-700 ${!isDark ? 'opacity-100 bg-slate-50' : 'opacity-0'}`} />
+        
+        {/* Glow orbs */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full mix-blend-screen filter blur-[100px] bg-purple-500/20 animate-blob" />
+        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full mix-blend-screen filter blur-[120px] bg-cyan-500/20 animate-blob animation-delay-2000" />
+        <div className="absolute bottom-[-20%] left-[20%] w-[60%] h-[50%] rounded-full mix-blend-screen filter blur-[100px] bg-fuchsia-500/20 animate-blob animation-delay-4000" />
+        
+        <div className={`absolute inset-0 opacity-[0.03] ${isDark ? 'bg-[url(/noise.svg)]' : ''} bg-repeat`} style={{ backgroundSize: '100px 100px' }} />
+      </div>
+    );
+  }
+
+  // Landing page background (Floral)
   return (
     <>
-      <div id="scroll-video-container" style={{ position: 'fixed', inset: 0, zIndex: 0, background: '#06040A', top: '-20%' }}>
+      <div id="scroll-video-container" className="fixed inset-0 z-0 top-[-20%] transition-colors duration-500" style={{ background: isDark ? '#06040A' : '#f8fafc' }}>
         <canvas id="video-canvas" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></canvas>
         <video id="video-fallback" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260616_212935_bbf608da-62d1-4f25-9be4-c346e4d09cc8.mp4" muted playsInline crossOrigin="anonymous" preload="auto" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}></video>
-        <div className="overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(6, 4, 10, 0.4)' }}></div>
+        
+        {/* Dynamic overlay based on theme */}
+        <div className={`absolute inset-0 transition-colors duration-500 ${isDark ? 'bg-[#06040A]/60' : 'bg-slate-50/80 backdrop-blur-[2px]'}`}></div>
       </div>
       <canvas id="particles-canvas" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}></canvas>
     </>

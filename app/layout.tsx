@@ -4,6 +4,7 @@ import { Inter, Oswald } from 'next/font/google';
 import { Toaster } from '../components/ui/sonner';
 import { Providers } from './providers';
 import { AnimatedBackground } from '../components/animated-background';
+import { SidebarLayout } from '../components/sidebar-layout';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -19,12 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.variable} ${oswald.variable} font-sans min-h-screen bg-[#06040A] text-white selection:bg-purple-500/30 veldara-theme`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${oswald.variable} font-sans min-h-screen bg-slate-50 text-slate-900 dark:bg-[#06040A] dark:text-white selection:bg-purple-500/30 veldara-theme transition-colors duration-300`}>
         <Providers>
           <AnimatedBackground />
           <div className="relative z-10">
-            {children}
+            <SidebarLayout>
+              {children}
+            </SidebarLayout>
           </div>
         </Providers>
         <Toaster position="bottom-right" />
