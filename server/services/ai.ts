@@ -32,7 +32,7 @@ async function waitForRateLimit(): Promise<void> {
 
 export class AIService {
   private genAI: GoogleGenerativeAI | null = null;
-  private model: GenerativeModel | null = null;
+  private models: GenerativeModel[] = [];
   private apiKey: string;
   private initialized = false;
 
@@ -46,9 +46,13 @@ export class AIService {
   private init(): void {
     if (this.initialized) return;
     this.genAI = new GoogleGenerativeAI(this.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    this.models = [
+      this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }),
+      this.genAI.getGenerativeModel({ model: 'gemini-1.5-pro' }),
+      this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    ];
     this.initialized = true;
-    logger.info('Gemini AI service initialized');
+    logger.info('Gemini AI service initialized with fallback models');
   }
 
   setApiKey(apiKey: string): void {
@@ -58,7 +62,7 @@ export class AIService {
   }
 
   async generateScript(topic: string, videoContext?: string, niche: string = 'General', aspectRatio: string = '9:16'): Promise<GeminiResponse> {
-    if (!this.model) this.init();
+    if (this.models.length === 0) this.init();
     await waitForRateLimit();
 
     const targetLengthSeconds = aspectRatio === '16:9' ? 120 : 45; // Longer for horizontal
@@ -90,27 +94,33 @@ OUTPUT FORMAT (respond with ONLY this JSON, no markdown):
   }
 }`;
 
-    try {
-      const result = await this.model!.generateContent([
-        { text: systemPrompt },
-        { text: `Write a script about: ${topic}` },
-      ]);
-      const response = result.response.text();
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        logger.info(`Generated script for topic: ${topic}`);
-        return parsed;
+    let lastError: any;
+    for (const model of this.models) {
+      try {
+        logger.info(`Attempting script generation with model: ${model.model}`);
+        const result = await model.generateContent([
+          { text: systemPrompt },
+          { text: `Write a script about: ${topic}` },
+        ]);
+        const response = result.response.text();
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          logger.info(`Generated script for topic: ${topic} using ${model.model}`);
+          return parsed;
+        }
+        throw new Error('Could not parse Gemini response as JSON');
+      } catch (error) {
+        logger.warn(`Model ${model.model} failed: ${error}`);
+        lastError = error;
       }
-      throw new Error('Could not parse Gemini response as JSON');
-    } catch (error) {
-      logger.error(`Script generation failed: ${error}`);
-      throw error;
     }
+    logger.error(`All models failed for script generation. Last error: ${lastError}`);
+    throw lastError;
   }
 
   async generateMetadata(script: string, topic?: string): Promise<{ title: string; hashtags: string[] }> {
-    if (!this.model) this.init();
+    if (this.models.length === 0) this.init();
     await waitForRateLimit();
 
     const prompt = `Given this video script, generate a catchy title (under 60 characters) and exactly 3 relevant hashtags.
@@ -124,16 +134,18 @@ Respond with ONLY this JSON format:
   "hashtags": ["tag1", "tag2", "tag3"]
 }`;
 
-    try {
-      const result = await this.model!.generateContent(prompt);
-      const response = result.response.text();
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) return JSON.parse(jsonMatch[0]);
-      return { title: topic || 'Check this out!', hashtags: ['viral', 'trending', 'fyp'] };
-    } catch (error) {
-      logger.error(`Metadata generation failed: ${error}`);
-      return { title: topic || 'Check this out!', hashtags: ['viral', 'trending', 'fyp'] };
+    for (const model of this.models) {
+      try {
+        const result = await model.generateContent(prompt);
+        const response = result.response.text();
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
+      } catch (error) {
+        logger.warn(`Model ${model.model} failed for metadata: ${error}`);
+      }
     }
+    logger.error(`All models failed for metadata generation.`);
+    return { title: topic || 'Check this out!', hashtags: ['viral', 'trending', 'fyp'] };
   }
 }
 
