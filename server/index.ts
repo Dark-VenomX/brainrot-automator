@@ -12,6 +12,8 @@ import { aiService, ttsService } from './services/ai';
 import { diagnosticService } from './services/diagnostic';
 import { normalizeSchedulerSettings, type SchedulerSettings } from './types';
 import logger from './utils/logger';
+import multer from 'multer';
+import path from 'path';
 
 const app = express();
 // Ignore Render's PORT variable (which Next.js uses) and bind to an internal port
@@ -318,6 +320,27 @@ app.post('/api/videos', requireAuth, async (req: Request, res: Response) => {
   } catch (error) {
     logger.error(`Error in POST /api/videos: ${error}`);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+const upload = multer({
+  dest: path.join(__dirname, '../../temp_uploads'),
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB limit
+});
+
+// Upload direct MP4 file
+app.post('/api/upload-video', requireAuth, upload.single('video'), (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video file provided' });
+    }
+    // Return a special internal URL that the video service can parse
+    const internalUrl = `file://${req.file.path}`;
+    res.json({ url: internalUrl });
+  } catch (error) {
+    logger.error(`Error uploading video: ${error}`);
+    res.status(500).json({ error: 'Failed to upload video' });
   }
 });
 

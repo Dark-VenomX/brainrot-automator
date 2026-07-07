@@ -81,6 +81,7 @@ export default function WorkspacePage() {
   const [videos, setVideos] = useState<VideoQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [trackerRefreshKey, setTrackerRefreshKey] = useState(0);
 
   // Form state
@@ -145,6 +146,24 @@ export default function WorkspacePage() {
 
     return () => clearInterval(interval);
   }, [videos]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploadingFile(true);
+    const formData = new FormData();
+    formData.append('video', file);
+    
+    try {
+      const res = await apiClient.uploadVideoFile(formData);
+      setSourceUrl(res.url);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -386,14 +405,30 @@ export default function WorkspacePage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="source-url" className="font-semibold text-gray-300">Video URL (YouTube or Direct MP4) <span className="text-red-500">*</span></Label>
-                      <Input
-                        id="source-url"
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        value={sourceUrl}
-                        onChange={(e) => setSourceUrl(e.target.value)}
-                        className="bg-black/40 border-white/10 focus-visible:ring-purple-500 text-white"
-                      />
+                      <Label htmlFor="source-url" className="font-semibold text-gray-300">Video Source (YouTube URL or Local Upload) <span className="text-red-500">*</span></Label>
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          id="source-url"
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          value={sourceUrl}
+                          onChange={(e) => setSourceUrl(e.target.value)}
+                          className="bg-black/40 border-white/10 focus-visible:ring-purple-500 text-white flex-1"
+                          disabled={isUploadingFile}
+                        />
+                        <span className="text-sm text-gray-400">or</span>
+                        <div className="relative">
+                          <input 
+                            type="file" 
+                            accept="video/mp4" 
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            onChange={handleFileUpload}
+                            disabled={isUploadingFile}
+                          />
+                          <Button type="button" variant="secondary" className="bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 border border-purple-500/30 whitespace-nowrap" disabled={isUploadingFile}>
+                            {isUploadingFile ? 'Uploading...' : 'Upload .mp4'}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">

@@ -97,10 +97,15 @@ class ApiClient {
   }
 
   private async fetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...options.headers as Record<string, string>,
-    };
+    const headers: Record<string, string> = { ...options.headers as Record<string, string> };
+    
+    // Only set application/json if body is not FormData
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+    } else {
+      // Delete Content-Type so browser can set multipart/form-data with correct boundary
+      delete headers['Content-Type'];
+    }
 
     if (this.accessToken) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
@@ -137,6 +142,13 @@ class ApiClient {
   }
 
   // Videos
+  async uploadVideoFile(formData: FormData): Promise<{ url: string }> {
+    return this.fetch('/api/upload-video', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   async createVideo(options: CreateVideoOptions): Promise<{ video: VideoQueueItem }> {
     return this.fetch('/api/videos', {
       method: 'POST',
