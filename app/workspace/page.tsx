@@ -88,6 +88,9 @@ export default function WorkspacePage() {
   const [sourceUrl, setSourceUrl] = useState('');
   const [startTimestamp, setStartTimestamp] = useState('00:00');
   const [endTimestamp, setEndTimestamp] = useState('00:45');
+  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [clipCount, setClipCount] = useState('10');
+  const [clipDuration, setClipDuration] = useState('45');
   const [topicInput, setTopicInput] = useState('');
   const [scriptInput, setScriptInput] = useState('');
   const [voiceName, setVoiceName] = useState('en-US-AriaNeural');
@@ -192,6 +195,9 @@ export default function WorkspacePage() {
         niche: niche === 'Custom' ? customNiche : niche,
         bg_music: bgMusic,
         font_style: fontStyle,
+        batch_mode: isBatchMode,
+        clip_count: isBatchMode ? parseInt(clipCount) : 1,
+        clip_duration: isBatchMode ? parseInt(clipDuration) : 45,
       });
 
       toast.success('Video queued for processing');
@@ -430,28 +436,74 @@ export default function WorkspacePage() {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="start-time" className="font-semibold text-gray-300">Start Time</Label>
-                        <Input
-                          id="start-time"
-                          placeholder="00:00"
-                          value={startTimestamp}
-                          onChange={(e) => setStartTimestamp(e.target.value)}
-                          className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="end-time" className="font-semibold text-gray-300">End Time</Label>
-                        <Input
-                          id="end-time"
-                          placeholder="00:45"
-                          value={endTimestamp}
-                          onChange={(e) => setEndTimestamp(e.target.value)}
-                          className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
-                        />
-                      </div>
+                    <div className="flex items-center justify-between mt-4">
+                      <Label className="font-semibold text-gray-300 cursor-pointer" onClick={() => setIsBatchMode(!isBatchMode)}>
+                        Batch Mode (Extract Multiple Clips)
+                      </Label>
+                      <Switch checked={isBatchMode} onCheckedChange={setIsBatchMode} />
                     </div>
+                    
+                    {!isBatchMode ? (
+                      <div className="grid grid-cols-2 gap-6 mt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="start-time" className="font-semibold text-gray-300">Start Time</Label>
+                          <Input
+                            id="start-time"
+                            placeholder="00:00"
+                            value={startTimestamp}
+                            onChange={(e) => setStartTimestamp(e.target.value)}
+                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="end-time" className="font-semibold text-gray-300">End Time</Label>
+                          <Input
+                            id="end-time"
+                            placeholder="00:45"
+                            value={endTimestamp}
+                            onChange={(e) => setEndTimestamp(e.target.value)}
+                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-4 mt-4 p-4 border border-purple-500/30 bg-purple-500/5 rounded-xl">
+                        <div className="space-y-2">
+                          <Label htmlFor="batch-start" className="font-semibold text-gray-300">Start Chopping From</Label>
+                          <Input
+                            id="batch-start"
+                            placeholder="00:00"
+                            value={startTimestamp}
+                            onChange={(e) => setStartTimestamp(e.target.value)}
+                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="clip-count" className="font-semibold text-gray-300">Number of Clips</Label>
+                          <Input
+                            id="clip-count"
+                            type="number"
+                            min="2"
+                            max="50"
+                            value={clipCount}
+                            onChange={(e) => setClipCount(e.target.value)}
+                            className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="clip-duration" className="font-semibold text-gray-300">Duration (seconds)</Label>
+                          <Input
+                            id="clip-duration"
+                            type="number"
+                            min="15"
+                            max="90"
+                            value={clipDuration}
+                            onChange={(e) => setClipDuration(e.target.value)}
+                            className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>

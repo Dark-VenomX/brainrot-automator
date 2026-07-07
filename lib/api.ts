@@ -44,6 +44,9 @@ interface CreateVideoOptions {
   niche?: string;
   bg_music?: string;
   font_style?: string;
+  batch_mode?: boolean;
+  clip_count?: number;
+  clip_duration?: number;
 }
 
 interface SchedulerSettings {
