@@ -107,8 +107,41 @@ export default function WorkspacePage() {
   const [startTimestamp, setStartTimestamp] = useState('00:00');
   const [endTimestamp, setEndTimestamp] = useState('00:45');
   const [isBatchMode, setIsBatchMode] = useState(false);
-  const [clipCount, setClipCount] = useState('10');
-  const [clipDuration, setClipDuration] = useState('45');
+  const [batchRules, setBatchRules] = useState([{ id: 1, count: 10, duration: 45 }]);
+  const [videoDuration, setVideoDuration] = useState(0);
+
+  // Hidden video element to read duration
+  useEffect(() => {
+    if (sourceUrl && (sourceUrl.startsWith('file://') || sourceUrl.startsWith('http'))) {
+      const vid = document.createElement('video');
+      vid.src = sourceUrl.replace('file://', '/api/local-file/'); // We need to fetch local file via some route, but for now we just load what we can
+      vid.onloadedmetadata = () => {
+        setVideoDuration(vid.duration);
+      };
+      if (sourceUrl.startsWith('data:')) {
+         vid.src = sourceUrl;
+      }
+    }
+  }, [sourceUrl]);
+
+  const addBatchRule = () => {
+    setBatchRules([...batchRules, { id: Date.now(), count: 1, duration: 45 }]);
+  };
+  
+  const removeBatchRule = (id: number) => {
+    setBatchRules(batchRules.filter(r => r.id !== id));
+  };
+  
+  const updateBatchRule = (id: number, field: 'count'|'duration', value: number) => {
+    setBatchRules(batchRules.map(r => r.id === id ? { ...r, [field]: value } : r));
+  };
+
+  const calculateRemaining = () => {
+    if (!videoDuration) return null;
+    const usedSeconds = batchRules.reduce((acc, rule) => acc + (rule.count * rule.duration), 0);
+    return Math.max(0, videoDuration - usedSeconds);
+  };
+
   const [topicInput, setTopicInput] = useState('');
   const [scriptInput, setScriptInput] = useState('');
   const [voiceName, setVoiceName] = useState('en-US-AriaNeural');
@@ -213,9 +246,7 @@ export default function WorkspacePage() {
         niche: niche === 'Custom' ? customNiche : niche,
         bg_music: bgMusic,
         font_style: fontStyle,
-        batch_mode: isBatchMode,
-        clip_count: isBatchMode ? parseInt(clipCount) : 1,
-        clip_duration: isBatchMode ? parseInt(clipDuration) : 45,
+        batch_rules: isBatchMode ? batchRules : undefined,
       });
 
       toast.success('Video queued for processing');
@@ -371,10 +402,10 @@ export default function WorkspacePage() {
             </div>
 
         <Tabs defaultValue="create" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 max-w-[400px] p-1.5 bg-slate-100 dark:bg-[#1E1A29] rounded-2xl border border-slate-200 dark:border-white/5 shadow-inner transition-colors duration-300">
-            <TabsTrigger value="create" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Create</TabsTrigger>
-            <TabsTrigger value="queue" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Queue</TabsTrigger>
-            <TabsTrigger value="accounts" className="rounded-xl py-2 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-[#2D283E] data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Accounts</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-[400px] p-1.5 bg-slate-100/50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-inner transition-colors duration-300">
+            <TabsTrigger value="create" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Create</TabsTrigger>
+            <TabsTrigger value="queue" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Queue</TabsTrigger>
+            <TabsTrigger value="accounts" className="rounded-lg py-1.5 font-medium data-[state=active]:bg-white dark:data-[state=active]:bg-white/10 data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400 data-[state=active]:shadow-sm transition-all duration-300 text-slate-500 dark:text-slate-400">Accounts</TabsTrigger>
           </TabsList>
 
           {/* Create Tab */}
@@ -427,13 +458,13 @@ export default function WorkspacePage() {
                         <div className="relative">
                           <input 
                             type="file" 
-                            accept="video/mp4,audio/mpeg" 
+                            accept="video/*" 
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             onChange={handleFileUpload}
                             disabled={isUploadingFile}
                           />
                           <Button type="button" variant="secondary" className="bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 border border-purple-500/30 whitespace-nowrap" disabled={isUploadingFile}>
-                            {isUploadingFile ? 'Uploading...' : 'Upload .mp4/.mp3'}
+                            {isUploadingFile ? 'Uploading...' : 'Upload Video (.mp4, .mov)'}
                           </Button>
                         </div>
                       </div>
@@ -469,40 +500,82 @@ export default function WorkspacePage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-3 gap-4 mt-4 p-4 border border-purple-500/30 bg-purple-500/5 rounded-xl">
-                        <div className="space-y-2">
-                          <Label htmlFor="batch-start" className="font-semibold text-gray-300">Start Chopping From</Label>
-                          <Input
-                            id="batch-start"
-                            placeholder="00:00"
-                            value={startTimestamp}
-                            onChange={(e) => setStartTimestamp(e.target.value)}
-                            className="bg-black/40 border-white/10 font-mono text-white focus-visible:ring-purple-500"
-                          />
+                      <div className="mt-4 p-5 border border-purple-500/30 bg-purple-500/5 dark:bg-purple-900/10 rounded-2xl space-y-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <Label htmlFor="batch-start" className="font-semibold text-slate-900 dark:text-gray-300 block mb-1">Start Chopping From</Label>
+                            <Input
+                              id="batch-start"
+                              placeholder="00:00"
+                              value={startTimestamp}
+                              onChange={(e) => setStartTimestamp(e.target.value)}
+                              className="w-32 bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 font-mono text-slate-900 dark:text-white"
+                            />
+                          </div>
+                          {videoDuration > 0 && (
+                            <div className="text-right">
+                              <span className="text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">Total Video: {Math.floor(videoDuration/60)}m {Math.floor(videoDuration%60)}s</span>
+                              <div className="text-xs text-slate-500 mt-1">Remaining: {Math.floor((calculateRemaining() || 0)/60)}m {Math.floor((calculateRemaining() || 0)%60)}s</div>
+                            </div>
+                          )}
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="clip-count" className="font-semibold text-gray-300">Number of Clips</Label>
-                          <Input
-                            id="clip-count"
-                            type="number"
-                            min="2"
-                            max="50"
-                            value={clipCount}
-                            onChange={(e) => setClipCount(e.target.value)}
-                            className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
-                          />
+                        
+                        <div className="space-y-3">
+                          <Label className="font-semibold text-slate-900 dark:text-gray-300 block">Clip Extraction Rules</Label>
+                          {batchRules.map((rule, index) => (
+                            <div key={rule.id} className="flex gap-3 items-end p-3 bg-white/50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/5">
+                              <div className="flex-1 space-y-1">
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">Number of Clips</Label>
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  max="50"
+                                  value={rule.count}
+                                  onChange={(e) => updateBatchRule(rule.id, 'count', parseInt(e.target.value) || 1)}
+                                  className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white h-9"
+                                />
+                              </div>
+                              <div className="flex-none flex items-center pb-2 text-slate-400">×</div>
+                              <div className="flex-1 space-y-1">
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">Duration (sec)</Label>
+                                <Input
+                                  type="number"
+                                  min="10"
+                                  max="120"
+                                  value={rule.duration}
+                                  onChange={(e) => updateBatchRule(rule.id, 'duration', parseInt(e.target.value) || 30)}
+                                  className="bg-white dark:bg-black/40 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white h-9"
+                                />
+                              </div>
+                              {batchRules.length > 1 && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={() => removeBatchRule(rule.id)}
+                                  className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="clip-duration" className="font-semibold text-gray-300">Duration (seconds)</Label>
-                          <Input
-                            id="clip-duration"
-                            type="number"
-                            min="15"
-                            max="90"
-                            value={clipDuration}
-                            onChange={(e) => setClipDuration(e.target.value)}
-                            className="bg-black/40 border-white/10 text-white focus-visible:ring-purple-500"
-                          />
+                        
+                        <div className="flex justify-between items-center pt-2">
+                           <Button type="button" variant="outline" onClick={addBatchRule} className="text-xs bg-transparent border-purple-500/30 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 h-8">
+                             <Plus className="w-3 h-3 mr-1" /> Add Rule
+                           </Button>
+                           {videoDuration > 0 && calculateRemaining()! > 30 && (
+                             <Button type="button" variant="secondary" onClick={() => {
+                               const remaining = calculateRemaining();
+                               if (remaining && remaining >= 30) {
+                                  const possibleCount = Math.floor(remaining / 30);
+                                  setBatchRules([...batchRules, { id: Date.now(), count: possibleCount, duration: 30 }]);
+                               }
+                             }} className="text-xs bg-purple-500 text-white hover:bg-purple-600 h-8">
+                               Auto-Fill Rest (30s)
+                             </Button>
+                           )}
                         </div>
                       </div>
                     )}

@@ -233,48 +233,85 @@ app.get('/api/dev/test-render/status', requireAuth, async (_req, res) => {
 // =====================
 app.post('/api/videos', requireAuth, async (req, res) => {
     try {
-        const { source_url, start_timestamp = '00:00', end_timestamp = '00:45', topic_input, generated_script, voice_name = 'en-US-AriaNeural', target_account_ids = [], auto_schedule = false, aspect_ratio = '9:16', niche, bg_music, font_style = 'classic', } = req.body;
+        const { source_url, start_timestamp = '00:00', end_timestamp = '00:45', topic_input, generated_script, voice_name = 'en-US-AriaNeural', target_account_ids = [], auto_schedule = false, aspect_ratio = '9:16', niche, bg_music, font_style = 'classic', batch_rules, // Array<{ count: number, duration: number }>
+         } = req.body;
         if (!source_url) {
             return res.status(400).json({ error: 'source_url is required' });
         }
+        const userId = req.user.id;
+        const inserts = [];
+        if (batch_rules && Array.isArray(batch_rules) && batch_rules.length > 0) {
+            let currentStart = parseTs(start_timestamp);
+            for (const rule of batch_rules) {
+                for (let i = 0; i < rule.count; i++) {
+                    inserts.push({
+                        user_id: userId,
+                        source_url,
+                        start_timestamp: formatTs(currentStart),
+                        end_timestamp: formatTs(currentStart + rule.duration),
+                        topic_input,
+                        generated_script,
+                        voice_name,
+                        target_account_ids,
+                        status: 'pending',
+                        metadata: { aspect_ratio, niche, bg_music, font_style },
+                    });
+                    currentStart += rule.duration;
+                }
+            }
+        }
+        else {
+            inserts.push({
+                user_id: userId,
+                source_url,
+                start_timestamp,
+                end_timestamp,
+                topic_input,
+                generated_script,
+                voice_name,
+                target_account_ids,
+                status: 'pending',
+                metadata: { aspect_ratio, niche, bg_music, font_style },
+            });
+        }
         const { data, error } = await supabase_1.supabaseAdmin
             .from(supabase_1.TABLES.VIDEO_QUEUE)
-            .insert({
-            user_id: req.user.id,
-            source_url,
-            start_timestamp,
-            end_timestamp,
-            topic_input,
-            generated_script,
-            voice_name,
-            target_account_ids,
-            status: 'pending',
-            metadata: {
-                aspect_ratio,
-                niche,
-                bg_music,
-                font_style,
-            },
-        })
-            .select()
-            .single();
+            .insert(inserts)
+            .select();
         if (error) {
-            logger_1.default.error(`Error creating video: ${error.message}`);
-            return res.status(500).json({ error: 'Failed to create video' });
+            logger_1.default.error(`Error creating video(s): ${error.message}`);
+            return res.status(500).json({ error: 'Failed to create video(s)' });
         }
-        if (auto_schedule && target_account_ids.length > 0) {
-            await scheduler_1.schedulerService.scheduleForNextSlot(data.id);
+        for (const item of data) {
+            if (auto_schedule && target_account_ids.length > 0) {
+                await scheduler_1.schedulerService.scheduleForNextSlot(item.id);
+            }
+            pipeline_1.videoPipeline.processVideo(item.id).catch(err => {
+                logger_1.default.error(`Background processing error for ${item.id}: ${err}`);
+            });
         }
-        pipeline_1.videoPipeline.processVideo(data.id).catch(err => {
-            logger_1.default.error(`Background processing error for ${data.id}: ${err}`);
-        });
-        res.status(201).json({ video: data });
+        res.status(201).json({ video: data[0], count: data.length });
     }
     catch (error) {
         logger_1.default.error(`Error in POST /api/videos: ${error}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+function parseTs(timestamp) {
+    if (/^\d+$/.test(timestamp))
+        return parseInt(timestamp, 10);
+    const parts = timestamp.split(':').map(p => parseInt(p, 10));
+    if (parts.length === 2)
+        return parts[0] * 60 + parts[1];
+    if (parts.length === 3)
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+}
+function formatTs(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
 const upload = (0, multer_1.default)({
     dest: path_1.default.join(__dirname, '../../temp_uploads'),
     limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB limit
