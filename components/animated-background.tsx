@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
+import { Workspace3DBg } from './workspace-3d-bg';
 
 export function AnimatedBackground() {
   const pathname = usePathname();
@@ -26,6 +27,7 @@ export function AnimatedBackground() {
     let frames: ImageBitmap[] = [];
     let framesReady = false;
     let lastFrameIndex = -1;
+    let currentFrameFloat = 0;
     let videoSeeking = false;
     let animationFrameId: number;
     let pAnimId: number;
@@ -114,10 +116,15 @@ export function AnimatedBackground() {
       const scrollY = window.scrollY;
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const scrollProgress = Math.max(0, Math.min(1, scrollY / maxScroll));
-      const targetFrame = Math.floor(scrollProgress * (frames.length - 1));
       
-      if (targetFrame !== lastFrameIndex) {
-        const frame = frames[targetFrame];
+      // Flawless lerping for cinematic transitions
+      const targetFrameFloat = scrollProgress * (frames.length - 1);
+      currentFrameFloat += (targetFrameFloat - currentFrameFloat) * 0.08; 
+      
+      const currentFrameIndex = Math.min(frames.length - 1, Math.max(0, Math.round(currentFrameFloat)));
+      
+      if (currentFrameIndex !== lastFrameIndex || Math.abs(targetFrameFloat - currentFrameFloat) > 0.01) {
+        const frame = frames[currentFrameIndex];
         
         const canvasRatio = canvas.width / canvas.height;
         const frameRatio = frame.width / frame.height;
@@ -139,7 +146,7 @@ export function AnimatedBackground() {
         ctx.fillStyle = '#06040A';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(frame, drawX, drawY, drawWidth, drawHeight);
-        lastFrameIndex = targetFrame;
+        lastFrameIndex = currentFrameIndex;
       }
     }
 
