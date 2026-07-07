@@ -82,6 +82,24 @@ export default function WorkspacePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [isUploadingBgMusic, setIsUploadingBgMusic] = useState(false);
+
+  const handleBgMusicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBgMusic(true);
+    try {
+      const formData = new FormData();
+      formData.append('video', file);
+      const res = await apiClient.uploadVideoFile(formData);
+      setBgMusic(res.url);
+    } catch (error: any) {
+      alert(`Failed to upload background music: ${error.message}`);
+    } finally {
+      setIsUploadingBgMusic(false);
+    }
+  };
   const [trackerRefreshKey, setTrackerRefreshKey] = useState(0);
 
   // Form state
@@ -425,13 +443,13 @@ export default function WorkspacePage() {
                         <div className="relative">
                           <input 
                             type="file" 
-                            accept="video/mp4" 
+                            accept="video/mp4,audio/mpeg" 
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                             onChange={handleFileUpload}
                             disabled={isUploadingFile}
                           />
                           <Button type="button" variant="secondary" className="bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 border border-purple-500/30 whitespace-nowrap" disabled={isUploadingFile}>
-                            {isUploadingFile ? 'Uploading...' : 'Upload .mp4'}
+                            {isUploadingFile ? 'Uploading...' : 'Upload .mp4/.mp3'}
                           </Button>
                         </div>
                       </div>
@@ -604,18 +622,37 @@ export default function WorkspacePage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="bg-music" className="font-semibold text-gray-300">Background Music</Label>
-                        <select
-                          id="bg-music"
-                          className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm"
-                          value={bgMusic}
-                          onChange={(e) => setBgMusic(e.target.value)}
-                        >
-                          <option value="none">None</option>
-                          <option value="lofi">Chill Lo-Fi</option>
-                          <option value="phonk">Aggressive Phonk</option>
-                          <option value="trap">Trap Beat</option>
-                          <option value="creepy">Creepy/Suspense</option>
-                        </select>
+                        <div className="flex gap-2">
+                          <select
+                            id="bg-music"
+                            className="w-full px-3 py-2.5 border rounded-lg bg-black/40 border-white/10 text-white focus-visible:ring-purple-500 focus-visible:outline-none text-sm flex-1"
+                            value={bgMusic.startsWith('file://') ? 'custom' : bgMusic}
+                            onChange={(e) => {
+                              if (e.target.value !== 'custom') {
+                                setBgMusic(e.target.value);
+                              }
+                            }}
+                          >
+                            <option value="none">None</option>
+                            <option value="lofi">Chill Lo-Fi</option>
+                            <option value="phonk">Aggressive Phonk</option>
+                            <option value="trap">Trap Beat</option>
+                            <option value="creepy">Creepy/Suspense</option>
+                            {bgMusic.startsWith('file://') && <option value="custom">Custom Uploaded MP3</option>}
+                          </select>
+                          <div className="relative">
+                            <input 
+                              type="file" 
+                              accept="audio/mpeg" 
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                              onChange={handleBgMusicUpload}
+                              disabled={isUploadingBgMusic}
+                            />
+                            <Button type="button" variant="secondary" className="bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 border border-purple-500/30 whitespace-nowrap px-3 h-[42px]" disabled={isUploadingBgMusic}>
+                              {isUploadingBgMusic ? 'Uploading...' : 'Upload MP3'}
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className="space-y-2">

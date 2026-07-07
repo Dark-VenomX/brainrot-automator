@@ -37,7 +37,7 @@ export class VideoService {
   async getVideoInfo(url: string): Promise<{ duration: number; title?: string }> {
     try {
       const cookiesArg = (await fs.stat('cookies.txt').then(() => true).catch(() => false)) ? '--cookies cookies.txt' : '';
-      const command = `${YT_DLP_PATH} --dump-json --no-warnings --no-check-certificate --youtube-skip-dash-manifest ${cookiesArg} --extractor-args "youtube:player_client=android,ios,web" "${url}"`;
+      const command = `${YT_DLP_PATH} --dump-json --no-warnings --no-check-certificate --youtube-skip-dash-manifest ${cookiesArg} "${url}"`;
       const { stdout } = await execAsync(command);
       const info = JSON.parse(stdout);
       
@@ -61,9 +61,43 @@ export class VideoService {
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
     try {
-      logger.info(`Downloading segment from ${url} (${startTime} to ${endTime})`);
+      logger.info(`Downloading/Extracting segment from ${url} (${startTime} to ${endTime})`);
+      
+      // Handle local uploaded files (both MP4 and MP3)
+      if (url.startsWith('file://')) {
+        const localPath = url.replace('file://', '');
+        const isMp3 = localPath.toLowerCase().endsWith('.mp3');
+        
+        if (isMp3) {
+          logger.info('Detected MP3 source. Extracting audio and pairing with stock background video...');
+          const tempAudioPath = path.join(this.tempDir, `temp_audio_${Date.now()}.mp3`);
+          
+          // 1. Slice the audio
+          await execAsync(`ffmpeg -y -i "${localPath}" -ss ${startTime} -to ${endTime} -c copy "${tempAudioPath}"`);
+          
+          // 2. Mix with stock Minecraft video (assuming stock is at public/assets/stock_minecraft.mp4)
+          // We use -shortest to make the video stop when the audio chunk stops.
+          const stockVideoPath = path.join(process.cwd(), 'public', 'assets', 'stock_minecraft.mp4');
+          
+          // If the stock video doesn't exist, we will use a color background as fallback
+          try {
+            await fs.access(stockVideoPath);
+            await execAsync(`ffmpeg -y -stream_loop -1 -i "${stockVideoPath}" -i "${tempAudioPath}" -map 0:v:0 -map 1:a:0 -c:v copy -c:a aac -shortest "${outputPath}"`);
+          } catch (e) {
+            // Fallback if stock video is missing: generate a black screen
+            await execAsync(`ffmpeg -y -f lavfi -i color=c=black:s=1080x1920 -i "${tempAudioPath}" -map 0:v:0 -map 1:a:0 -c:v libx264 -c:a aac -shortest "${outputPath}"`);
+          }
+          return outputPath;
+        } else {
+          logger.info('Detected MP4 source. Extracting local video clip via ffmpeg...');
+          await execAsync(`ffmpeg -y -i "${localPath}" -ss ${startTime} -to ${endTime} -c copy "${outputPath}"`);
+          return outputPath;
+        }
+      }
+
+      // Handle YouTube URLs
       const cookiesArg = (await fs.stat('cookies.txt').then(() => true).catch(() => false)) ? '--cookies cookies.txt' : '';
-      const command = `${YT_DLP_PATH} --download-sections "*${startTime}-${endTime}" -o "${outputPath}" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --force-keyframes-at-cuts --no-warnings --no-check-certificate ${cookiesArg} --extractor-args "youtube:player_client=android,ios,web" "${url}"`;
+      const command = `${YT_DLP_PATH} --download-sections "*${startTime}-${endTime}" -o "${outputPath}" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --force-keyframes-at-cuts --no-warnings --no-check-certificate --ffmpeg-location "${ffmpegInstaller.path}" ${cookiesArg} "${url}"`;
       
       await execAsync(command);
       return outputPath;
